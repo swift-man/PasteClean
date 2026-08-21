@@ -52,6 +52,29 @@ enum CodeCleaner {
     var stringInterpolations: [StringInterpolation] = []
   }
 
+  /// Advances lexical state through a file without rescanning an earlier prefix.
+  ///
+  /// Selection ranges are sorted before planning, so each subsequent checkpoint
+  /// can continue from the previous one. `scannedLineCount` makes the linear-scan
+  /// guarantee deterministic to test without relying on wall-clock timings.
+  struct LexicalStateCursor {
+    private var state = LexicalState(multilineStringHashCount: nil)
+    private var nextLine = 0
+    private(set) var scannedLineCount = 0
+
+    mutating func state(before line: Int, in lines: [String]) -> LexicalState {
+      precondition(line >= nextLine, "Lexical checkpoints must be requested in order")
+      precondition(line <= lines.count, "Lexical checkpoint exceeds the buffer")
+      state = CodeCleaner.lexicalState(
+        after: lines[nextLine..<line],
+        startingWith: state
+      )
+      scannedLineCount += line - nextLine
+      nextLine = line
+      return state
+    }
+  }
+
   /// Longest run of blank lines the cleaner will leave behind.
   static let maximumConsecutiveBlankLines = 1
 
@@ -128,7 +151,17 @@ enum CodeCleaner {
   }
 
   static func lexicalState<S: Sequence>(after lines: S) -> LexicalState where S.Element == String {
-    lines.reduce(LexicalState(multilineStringHashCount: nil)) { state, line in
+    lexicalState(
+      after: lines,
+      startingWith: LexicalState(multilineStringHashCount: nil)
+    )
+  }
+
+  static func lexicalState<S: Sequence>(
+    after lines: S,
+    startingWith initialState: LexicalState
+  ) -> LexicalState where S.Element == String {
+    lines.reduce(initialState) { state, line in
       lexicalScan(after: line, startingWith: state).state
     }
   }

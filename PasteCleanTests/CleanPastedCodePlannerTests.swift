@@ -330,6 +330,112 @@ struct CleanPastedCodePlannerTests {
     ])
   }
 
+  @Test("대형 파일의 여러 선택 prefix는 각 줄을 한 번만 전진 스캔한다")
+  func scansLargeFilePrefixesOnce() {
+    let lines = (0..<5_000).map { index in
+      switch index % 20 {
+      case 0: "let text = #\"\"\""
+      case 19: "    \"\"\"#"
+      default: "    value \(index)   "
+      }
+    }
+    let checkpoints = Array(stride(from: 0, to: lines.count, by: 97))
+    var cursor = CodeCleaner.LexicalStateCursor()
+
+    for checkpoint in checkpoints {
+      let actual = cursor.state(before: checkpoint, in: lines)
+      let expected = CodeCleaner.lexicalState(after: lines[..<checkpoint])
+      #expect(actual == expected)
+    }
+
+    #expect(cursor.scannedLineCount == checkpoints.last ?? 0)
+  }
+
+  @Test("전체 플래너의 다중 커서와 선택 매핑 작업량은 입력 크기에 선형이다")
+  func keepsEndToEndPlanningWorkLinear() throws {
+    let lineCount = 5_000
+    let lines = (0..<lineCount).map { "let value\($0) = \($0)  \n" }
+    let wholeBufferCarets = stride(from: 0, to: lineCount, by: 5).map {
+      range(from: ($0, 4), to: ($0, 4))
+    }
+
+    let wholeBuffer = try #require(CleanPastedCodePlan.makeWithMetrics(
+      lines: lines,
+      selections: wholeBufferCarets,
+      style: .default
+    ))
+    #expect(wholeBuffer.plan.resultingSelections.count == wholeBufferCarets.count)
+    #expect(wholeBuffer.metrics.lexicalLinesScanned == 0)
+    #expect(wholeBuffer.metrics.lineMappingBuildCount == 1)
+    #expect(wholeBuffer.metrics.lineMappingSourceLineCount == lineCount)
+    #expect(wholeBuffer.metrics.positionQueryCount == wholeBufferCarets.count)
+    #expect(wholeBuffer.metrics.selectiveIndexLineCount == 0)
+
+    var mixedSelections: [EditorRange] = []
+    mixedSelections.reserveCapacity(lineCount / 5)
+    for line in stride(from: 0, to: lineCount, by: 10) {
+      mixedSelections.append(range(from: (line, 0), to: (line, 1)))
+      mixedSelections.append(range(from: (line + 1, 4), to: (line + 1, 4)))
+    }
+
+    let selective = try #require(CleanPastedCodePlan.makeWithMetrics(
+      lines: lines,
+      selections: mixedSelections,
+      style: .default
+    ))
+    let selectedRangeCount = mixedSelections.count / 2
+    #expect(selective.plan.resultingSelections.count == mixedSelections.count)
+    #expect(selective.metrics.lexicalLinesScanned == lineCount - 10)
+    #expect(selective.metrics.lineMappingBuildCount == selectedRangeCount)
+    #expect(selective.metrics.lineMappingSourceLineCount == selectedRangeCount)
+    #expect(selective.metrics.positionQueryCount == selectedRangeCount)
+    #expect(selective.metrics.selectionTargetAssignmentCount == selectedRangeCount)
+    #expect(selective.metrics.selectionResultLookupCount == mixedSelections.count)
+    #expect(selective.metrics.selectiveIndexLineCount == lineCount)
+  }
+
+  @Test("편집 버퍼 경계는 뒤 범위부터 적용하고 selection을 한 번 갱신한다")
+  func appliesOneEditorBufferTransaction() {
+    let buffer = InMemoryEditorBuffer(
+      lines: [
+        "let a = 1  \n", "\n", "let b = 2  \n", "keep\n",
+        "let c = 3  \n", "\n", "let d = 4  \n",
+      ],
+      selections: [
+        range(from: (0, 0), to: (2, 11)),
+        range(from: (4, 0), to: (6, 11)),
+      ],
+      indentationStyle: .default
+    )
+
+    #expect(CleanPastedCodeEditor.clean(buffer))
+    #expect(buffer.replacedRanges == [4..<7, 0..<3])
+    #expect(buffer.lines == [
+      "let a = 1\n", "let b = 2\n", "keep\n", "let c = 3\n", "let d = 4\n",
+    ])
+    #expect(buffer.selections == [
+      range(from: (0, 0), to: (1, 9)),
+      range(from: (3, 0), to: (4, 9)),
+    ])
+    #expect(buffer.selectionReplacementCount == 1)
+  }
+
+  @Test("편집 계획이 없으면 버퍼를 변경하지 않는다")
+  func leavesInvalidEditorBufferUnchanged() {
+    let invalidSelection = range(from: (9, 0), to: (10, 1))
+    let buffer = InMemoryEditorBuffer(
+      lines: ["let value = 1\n"],
+      selections: [invalidSelection],
+      indentationStyle: .default
+    )
+
+    #expect(!CleanPastedCodeEditor.clean(buffer))
+    #expect(buffer.lines == ["let value = 1\n"])
+    #expect(buffer.selections == [invalidSelection])
+    #expect(buffer.replacedRanges.isEmpty)
+    #expect(buffer.selectionReplacementCount == 0)
+  }
+
   private func range(
     from start: (line: Int, column: Int),
     to end: (line: Int, column: Int)
@@ -338,5 +444,33 @@ struct CleanPastedCodePlannerTests {
       start: EditorPosition(line: start.line, column: start.column),
       end: EditorPosition(line: end.line, column: end.column)
     )
+  }
+}
+
+private final class InMemoryEditorBuffer: CleanPastedCodeBuffer {
+  var lines: [String]
+  var selections: [EditorRange]
+  let indentationStyle: IndentationStyle
+  private(set) var replacedRanges: [Range<Int>] = []
+  private(set) var selectionReplacementCount = 0
+
+  init(
+    lines: [String],
+    selections: [EditorRange],
+    indentationStyle: IndentationStyle
+  ) {
+    self.lines = lines
+    self.selections = selections
+    self.indentationStyle = indentationStyle
+  }
+
+  func replaceLines(in range: Range<Int>, with replacementLines: [String]) {
+    replacedRanges.append(range)
+    lines.replaceSubrange(range, with: replacementLines)
+  }
+
+  func replaceSelections(with selections: [EditorRange]) {
+    selectionReplacementCount += 1
+    self.selections = selections
   }
 }
