@@ -351,6 +351,49 @@ struct CleanPastedCodePlannerTests {
     #expect(cursor.scannedLineCount == checkpoints.last ?? 0)
   }
 
+  @Test("전체 플래너의 다중 커서와 선택 매핑 작업량은 입력 크기에 선형이다")
+  func keepsEndToEndPlanningWorkLinear() throws {
+    let lineCount = 5_000
+    let lines = (0..<lineCount).map { "let value\($0) = \($0)  \n" }
+    let wholeBufferCarets = stride(from: 0, to: lineCount, by: 5).map {
+      range(from: ($0, 4), to: ($0, 4))
+    }
+
+    let wholeBuffer = try #require(CleanPastedCodePlan.makeWithMetrics(
+      lines: lines,
+      selections: wholeBufferCarets,
+      style: .default
+    ))
+    #expect(wholeBuffer.plan.resultingSelections.count == wholeBufferCarets.count)
+    #expect(wholeBuffer.metrics.lexicalLinesScanned == 0)
+    #expect(wholeBuffer.metrics.lineMappingBuildCount == 1)
+    #expect(wholeBuffer.metrics.lineMappingSourceLineCount == lineCount)
+    #expect(wholeBuffer.metrics.positionQueryCount == wholeBufferCarets.count)
+    #expect(wholeBuffer.metrics.selectiveIndexLineCount == 0)
+
+    var mixedSelections: [EditorRange] = []
+    mixedSelections.reserveCapacity(lineCount / 5)
+    for line in stride(from: 0, to: lineCount, by: 10) {
+      mixedSelections.append(range(from: (line, 0), to: (line, 1)))
+      mixedSelections.append(range(from: (line + 1, 4), to: (line + 1, 4)))
+    }
+
+    let selective = try #require(CleanPastedCodePlan.makeWithMetrics(
+      lines: lines,
+      selections: mixedSelections,
+      style: .default
+    ))
+    let selectedRangeCount = mixedSelections.count / 2
+    #expect(selective.plan.resultingSelections.count == mixedSelections.count)
+    #expect(selective.metrics.lexicalLinesScanned == lineCount - 10)
+    #expect(selective.metrics.lineMappingBuildCount == selectedRangeCount)
+    #expect(selective.metrics.lineMappingSourceLineCount == selectedRangeCount)
+    #expect(selective.metrics.positionQueryCount == selectedRangeCount)
+    #expect(selective.metrics.selectionTargetAssignmentCount == selectedRangeCount)
+    #expect(selective.metrics.selectionResultLookupCount == mixedSelections.count)
+    #expect(selective.metrics.selectiveIndexLineCount == lineCount)
+  }
+
   @Test("편집 버퍼 경계는 뒤 범위부터 적용하고 selection을 한 번 갱신한다")
   func appliesOneEditorBufferTransaction() {
     let buffer = InMemoryEditorBuffer(

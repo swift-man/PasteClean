@@ -32,6 +32,17 @@ struct CleanPastedCodePlan: Equatable {
     var replacementLines: [String]
   }
 
+  /// Deterministic work counters used by performance regression tests.
+  struct PerformanceMetrics: Equatable {
+    fileprivate(set) var lexicalLinesScanned = 0
+    fileprivate(set) var lineMappingBuildCount = 0
+    fileprivate(set) var lineMappingSourceLineCount = 0
+    fileprivate(set) var positionQueryCount = 0
+    fileprivate(set) var selectionTargetAssignmentCount = 0
+    fileprivate(set) var selectionResultLookupCount = 0
+    fileprivate(set) var selectiveIndexLineCount = 0
+  }
+
   var edits: [Edit]
   var resultingSelections: [EditorRange]
 
@@ -40,9 +51,42 @@ struct CleanPastedCodePlan: Equatable {
     selections: [EditorRange],
     style: IndentationStyle
   ) -> Self? {
+    build(
+      lines: originalLines,
+      selections: selections,
+      style: style,
+      recorder: nil
+    )
+  }
+
+  static func makeWithMetrics(
+    lines originalLines: [String],
+    selections: [EditorRange],
+    style: IndentationStyle
+  ) -> (plan: Self, metrics: PerformanceMetrics)? {
+    let recorder = PerformanceRecorder()
+    guard let plan = build(
+      lines: originalLines,
+      selections: selections,
+      style: style,
+      recorder: recorder
+    ) else { return nil }
+    return (plan, recorder.metrics)
+  }
+
+  private static func build(
+    lines originalLines: [String],
+    selections: [EditorRange],
+    style: IndentationStyle,
+    recorder: PerformanceRecorder?
+  ) -> Self? {
     guard !originalLines.isEmpty else { return nil }
 
-    let target = target(for: selections, lineCount: originalLines.count)
+    let target = target(
+      for: selections,
+      lineCount: originalLines.count,
+      recorder: recorder
+    )
     guard !target.ranges.isEmpty else { return nil }
 
     let contentLines = originalLines.map(strippingLineEnding)
@@ -51,13 +95,21 @@ struct CleanPastedCodePlan: Equatable {
     let startingStates = target.ranges.map {
       lexicalStateCursor.state(before: $0.lowerBound, in: contentLines)
     }
+    recorder?.recordLexicalLines(scanned: lexicalStateCursor.scannedLineCount)
     let cleanedTargets = zip(target.ranges, startingStates).map { range, startingState in
-      (
+      let selectedLines = Array(contentLines[range])
+      let cleanedLines = CodeCleaner.clean(
+        lines: selectedLines,
+        style: style,
+        startingLexicalState: startingState
+      )
+      return CleanedTarget(
         original: range,
-        cleaned: CodeCleaner.clean(
-          lines: Array(contentLines[range]),
-          style: style,
-          startingLexicalState: startingState
+        cleaned: cleanedLines,
+        mapping: LineMapping(
+          originalLines: selectedLines,
+          cleanedLines: cleanedLines,
+          recorder: recorder
         )
       )
     }
@@ -75,51 +127,47 @@ struct CleanPastedCodePlan: Equatable {
 
     let resultingSelections: [EditorRange]
     if target.isWholeBuffer {
-      let cleanedLines = cleanedTargets[0].cleaned
+      let mapping = cleanedTargets[0].mapping
       let carets = selections.isEmpty
         ? [EditorPosition(line: 0, column: 0)]
         : selections.map(\.start)
       resultingSelections = carets.map { caret in
-        let position = mappedPosition(
-          caret,
-          originalLines: contentLines,
-          cleanedLines: cleanedLines
-        )
+        let position = mapping.position(for: caret)
         return EditorRange(start: position, end: position)
       }
     } else {
       var precedingLineDelta = 0
-      let mappedTargets = zip(cleanedTargets, edits).map { item, edit in
+      var selectionByRange: [Range<Int>: EditorRange] = [:]
+      selectionByRange.reserveCapacity(cleanedTargets.count)
+      for (item, edit) in zip(cleanedTargets, edits) {
         defer { precedingLineDelta += edit.replacementLines.count - item.original.count }
-        return (
-          original: item.original,
-          selection: selection(
-            startingAt: item.original.lowerBound + precedingLineDelta,
-            covering: item.cleaned
-          )
+        selectionByRange[item.original] = selection(
+          startingAt: item.original.lowerBound + precedingLineDelta,
+          covering: item.cleaned
         )
       }
 
-      var emittedRanges: [Range<Int>] = []
-      resultingSelections = selections.compactMap { originalSelection in
+      let positionMapping = selections.contains(where: \.isEmpty)
+        ? SelectivePositionMapping(
+          targets: cleanedTargets,
+          originalLines: contentLines,
+          recorder: recorder
+        )
+        : nil
+      var emittedRanges = Set<Range<Int>>()
+      resultingSelections = selections.enumerated().compactMap { index, originalSelection in
+        recorder?.recordSelectionResultLookup()
         if originalSelection.isEmpty {
-          let position = mappedPosition(
-            originalSelection.start,
-            through: cleanedTargets,
-            originalLines: contentLines
-          )
+          guard let positionMapping else { return nil }
+          let position = positionMapping.position(for: originalSelection.start)
           return EditorRange(start: position, end: position)
         }
 
-        guard let range = lineRange(for: originalSelection, lineCount: originalLines.count),
-              let mappedTarget = mappedTargets.first(where: {
-                $0.original.lowerBound <= range.lowerBound
-                  && range.upperBound <= $0.original.upperBound
-              }),
-              !emittedRanges.contains(mappedTarget.original)
+        guard let range = target.rangeBySelectionIndex[index],
+              let mappedSelection = selectionByRange[range],
+              emittedRanges.insert(range).inserted
         else { return nil }
-        emittedRanges.append(mappedTarget.original)
-        return mappedTarget.selection
+        return mappedSelection
       }
     }
 
@@ -131,25 +179,82 @@ struct CleanPastedCodePlan: Equatable {
   private struct Target {
     var ranges: [Range<Int>]
     var isWholeBuffer: Bool
+    var rangeBySelectionIndex: [Range<Int>?]
   }
 
-  private static func target(for selections: [EditorRange], lineCount: Int) -> Target {
-    let nonEmpty = selections.filter { !$0.isEmpty }
-    guard !nonEmpty.isEmpty else {
-      return Target(ranges: [0..<lineCount], isWholeBuffer: true)
+  private struct IndexedRange {
+    var selectionIndex: Int
+    var range: Range<Int>
+  }
+
+  private struct MergedRange {
+    var range: Range<Int>
+    var selectionIndices: [Int]
+  }
+
+  private static func target(
+    for selections: [EditorRange],
+    lineCount: Int,
+    recorder: PerformanceRecorder?
+  ) -> Target {
+    guard selections.contains(where: { !$0.isEmpty }) else {
+      return Target(
+        ranges: [0..<lineCount],
+        isWholeBuffer: true,
+        rangeBySelectionIndex: Array(repeating: nil, count: selections.count)
+      )
     }
 
-    let ranges = nonEmpty.compactMap { lineRange(for: $0, lineCount: lineCount) }
+    let indexedRanges = selections.enumerated().compactMap { index, selection -> IndexedRange? in
+      guard !selection.isEmpty,
+            let range = lineRange(for: selection, lineCount: lineCount)
+      else { return nil }
+      return IndexedRange(selectionIndex: index, range: range)
+    }
 
-    let merged = ranges.sorted { $0.lowerBound < $1.lowerBound }
-      .reduce(into: [Range<Int>]()) { merged, range in
-        if let last = merged.last, range.lowerBound <= last.upperBound {
-          merged[merged.count - 1] = last.lowerBound..<max(last.upperBound, range.upperBound)
-        } else {
-          merged.append(range)
-        }
+    guard !indexedRanges.isEmpty else {
+      return Target(
+        ranges: [],
+        isWholeBuffer: false,
+        rangeBySelectionIndex: Array(repeating: nil, count: selections.count)
+      )
+    }
+
+    let sortedRanges = indexedRanges.sorted {
+      if $0.range.lowerBound == $1.range.lowerBound {
+        return $0.range.upperBound < $1.range.upperBound
       }
-    return Target(ranges: merged, isWholeBuffer: false)
+      return $0.range.lowerBound < $1.range.lowerBound
+    }
+    var merged: [MergedRange] = []
+    merged.reserveCapacity(sortedRanges.count)
+    for item in sortedRanges {
+      if let last = merged.last, item.range.lowerBound <= last.range.upperBound {
+        merged[merged.count - 1].range = last.range.lowerBound..<max(
+          last.range.upperBound,
+          item.range.upperBound
+        )
+        merged[merged.count - 1].selectionIndices.append(item.selectionIndex)
+      } else {
+        merged.append(MergedRange(
+          range: item.range,
+          selectionIndices: [item.selectionIndex]
+        ))
+      }
+    }
+
+    var rangeBySelectionIndex = Array<Range<Int>?>(repeating: nil, count: selections.count)
+    for item in merged {
+      for selectionIndex in item.selectionIndices {
+        rangeBySelectionIndex[selectionIndex] = item.range
+        recorder?.recordSelectionTargetAssignment()
+      }
+    }
+    return Target(
+      ranges: merged.map(\.range),
+      isWholeBuffer: false,
+      rangeBySelectionIndex: rangeBySelectionIndex
+    )
   }
 
   private static func lineRange(
@@ -174,92 +279,182 @@ struct CleanPastedCodePlan: Equatable {
     )
   }
 
-  /// Keeps a caret attached to the same logical line when blank lines before
-  /// it are removed. Non-blank text is stable under cleaning after horizontal
-  /// whitespace is ignored, so a single forward alignment identifies every
-  /// retained source line without guessing from line-count deltas.
-  private static func mappedPosition(
-    _ position: EditorPosition,
-    originalLines: [String],
-    cleanedLines: [String]
-  ) -> EditorPosition {
-    guard !cleanedLines.isEmpty else { return EditorPosition(line: 0, column: 0) }
+  /// A source-to-cleaned line alignment built once per edit and shared by every
+  /// caret query. Nearest retained lines are precomputed so deleted blank-line
+  /// carets also map in constant time.
+  private struct LineMapping {
+    private let originalLines: [String]
+    private let cleanedLines: [String]
+    private let mappedLineByOriginal: [Int?]
+    private let nextMappedLine: [Int?]
+    private let previousMappedLine: [Int?]
+    private let recorder: PerformanceRecorder?
 
-    let originalLine = min(max(position.line, 0), originalLines.count - 1)
-    var mappings = Array<Int?>(repeating: nil, count: originalLines.count)
-    var sourceIndex = 0
-    var resultIndex = 0
+    init(
+      originalLines: [String],
+      cleanedLines: [String],
+      recorder: PerformanceRecorder?
+    ) {
+      self.originalLines = originalLines
+      self.cleanedLines = cleanedLines
+      self.recorder = recorder
 
-    while sourceIndex < originalLines.count, resultIndex < cleanedLines.count {
-      if comparableContent(originalLines[sourceIndex]) == comparableContent(cleanedLines[resultIndex]) {
-        mappings[sourceIndex] = resultIndex
-        sourceIndex += 1
-        resultIndex += 1
-      } else {
+      var mappings = Array<Int?>(repeating: nil, count: originalLines.count)
+      var sourceIndex = 0
+      var resultIndex = 0
+      while sourceIndex < originalLines.count, resultIndex < cleanedLines.count {
+        if CleanPastedCodePlan.comparableContent(originalLines[sourceIndex])
+          == CleanPastedCodePlan.comparableContent(cleanedLines[resultIndex]) {
+          mappings[sourceIndex] = resultIndex
+          resultIndex += 1
+        }
         sourceIndex += 1
       }
+      mappedLineByOriginal = mappings
+
+      var nextMappings = Array<Int?>(repeating: nil, count: originalLines.count)
+      var next: Int?
+      for index in originalLines.indices.reversed() {
+        nextMappings[index] = next
+        if let mapped = mappings[index] { next = mapped }
+      }
+      nextMappedLine = nextMappings
+
+      var previousMappings = Array<Int?>(repeating: nil, count: originalLines.count)
+      var previous: Int?
+      for index in originalLines.indices {
+        previousMappings[index] = previous
+        if let mapped = mappings[index] { previous = mapped }
+      }
+      previousMappedLine = previousMappings
+      recorder?.recordLineMapping(sourceLineCount: originalLines.count)
     }
 
-    if let mappedLine = mappings[originalLine] {
-      return EditorPosition(
-        line: mappedLine,
-        column: mappedColumn(
-          position.column,
-          from: originalLines[originalLine],
-          to: cleanedLines[mappedLine]
+    func position(for position: EditorPosition) -> EditorPosition {
+      recorder?.recordPositionQuery()
+      guard !cleanedLines.isEmpty else { return EditorPosition(line: 0, column: 0) }
+
+      let originalLine = min(max(position.line, 0), originalLines.count - 1)
+      if let mappedLine = mappedLineByOriginal[originalLine] {
+        return EditorPosition(
+          line: mappedLine,
+          column: CleanPastedCodePlan.mappedColumn(
+            position.column,
+            from: originalLines[originalLine],
+            to: cleanedLines[mappedLine]
+          )
         )
+      }
+
+      if let nextLine = nextMappedLine[originalLine] {
+        return EditorPosition(line: nextLine, column: 0)
+      }
+      let previousLine = previousMappedLine[originalLine] ?? cleanedLines.count - 1
+      return EditorPosition(
+        line: previousLine,
+        column: cleanedLines[previousLine].utf16.count
       )
     }
-
-    if let nextLine = mappings[(originalLine + 1)...].compactMap({ $0 }).first {
-      return EditorPosition(line: nextLine, column: 0)
-    }
-    let previousLine = mappings[..<originalLine].reversed().compactMap { $0 }.first
-      ?? cleanedLines.count - 1
-    return EditorPosition(
-      line: previousLine,
-      column: cleanedLines[previousLine].utf16.count
-    )
   }
 
-  /// Moves a caret through the selected edits while leaving unedited text in
-  /// place. A caret inside an edit uses the same logical-line and indentation
-  /// mapping as whole-buffer cleanup; a caret after it only receives its line
-  /// count delta.
-  private static func mappedPosition(
-    _ position: EditorPosition,
-    through cleanedTargets: [(original: Range<Int>, cleaned: [String])],
-    originalLines: [String]
-  ) -> EditorPosition {
-    let originalLine = min(max(position.line, 0), originalLines.count - 1)
-    var precedingLineDelta = 0
+  private struct CleanedTarget {
+    var original: Range<Int>
+    var cleaned: [String]
+    var mapping: LineMapping
+  }
 
-    for target in cleanedTargets {
-      if originalLine < target.original.lowerBound { break }
-      if originalLine >= target.original.upperBound {
-        precedingLineDelta += target.cleaned.count - target.original.count
-        continue
+  /// Indexes every original line once so mixed empty carets do not rescan the
+  /// edit list. A query then performs only array lookups plus one shared mapping.
+  private struct SelectivePositionMapping {
+    private let targets: [CleanedTarget]
+    private let originalLines: [String]
+    private let targetIndexByLine: [Int?]
+    private let precedingLineDeltaByLine: [Int]
+    private let recorder: PerformanceRecorder?
+
+    init(
+      targets: [CleanedTarget],
+      originalLines: [String],
+      recorder: PerformanceRecorder?
+    ) {
+      self.targets = targets
+      self.originalLines = originalLines
+      self.recorder = recorder
+
+      var targetIndexes = Array<Int?>(repeating: nil, count: originalLines.count)
+      for (targetIndex, target) in targets.enumerated() {
+        for line in target.original {
+          targetIndexes[line] = targetIndex
+        }
+      }
+      targetIndexByLine = targetIndexes
+
+      var deltas = Array(repeating: 0, count: originalLines.count)
+      var targetIndex = 0
+      var precedingDelta = 0
+      for line in originalLines.indices {
+        while targetIndex < targets.count,
+              targets[targetIndex].original.upperBound <= line {
+          let target = targets[targetIndex]
+          precedingDelta += target.cleaned.count - target.original.count
+          targetIndex += 1
+        }
+        deltas[line] = precedingDelta
+      }
+      precedingLineDeltaByLine = deltas
+      recorder?.recordSelectiveIndex(lineCount: originalLines.count)
+    }
+
+    func position(for position: EditorPosition) -> EditorPosition {
+      let originalLine = min(max(position.line, 0), originalLines.count - 1)
+      let precedingLineDelta = precedingLineDeltaByLine[originalLine]
+      guard let targetIndex = targetIndexByLine[originalLine] else {
+        recorder?.recordPositionQuery()
+        return EditorPosition(
+          line: originalLine + precedingLineDelta,
+          column: min(max(position.column, 0), originalLines[originalLine].utf16.count)
+        )
       }
 
-      let localPosition = EditorPosition(
+      let target = targets[targetIndex]
+      let mapped = target.mapping.position(for: EditorPosition(
         line: originalLine - target.original.lowerBound,
         column: position.column
-      )
-      let mapped = mappedPosition(
-        localPosition,
-        originalLines: Array(originalLines[target.original]),
-        cleanedLines: target.cleaned
-      )
+      ))
       return EditorPosition(
         line: target.original.lowerBound + precedingLineDelta + mapped.line,
         column: mapped.column
       )
     }
+  }
 
-    return EditorPosition(
-      line: originalLine + precedingLineDelta,
-      column: min(max(position.column, 0), originalLines[originalLine].utf16.count)
-    )
+  private final class PerformanceRecorder {
+    private(set) var metrics = PerformanceMetrics()
+
+    func recordLexicalLines(scanned count: Int) {
+      metrics.lexicalLinesScanned += count
+    }
+
+    func recordLineMapping(sourceLineCount: Int) {
+      metrics.lineMappingBuildCount += 1
+      metrics.lineMappingSourceLineCount += sourceLineCount
+    }
+
+    func recordPositionQuery() {
+      metrics.positionQueryCount += 1
+    }
+
+    func recordSelectionTargetAssignment() {
+      metrics.selectionTargetAssignmentCount += 1
+    }
+
+    func recordSelectionResultLookup() {
+      metrics.selectionResultLookupCount += 1
+    }
+
+    func recordSelectiveIndex(lineCount: Int) {
+      metrics.selectiveIndexLineCount += lineCount
+    }
   }
 
   /// Keeps a caret attached to the same character in the code body when the
