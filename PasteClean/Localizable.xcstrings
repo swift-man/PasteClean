@@ -16,6 +16,13 @@
         "ko": { "stringUnit": { "state": "translated", "value": "결과" } }
       }
     },
+    "Xcode Extension": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Xcode Extension" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "Xcode 확장 프로그램" } }
+      }
+    },
     "Tab": {
       "extractionState": "manual",
       "localizations": {
@@ -28,6 +35,13 @@
       "localizations": {
         "en": { "stringUnit": { "state": "translated", "value": "Indent" } },
         "ko": { "stringUnit": { "state": "translated", "value": "들여쓰기" } }
+      }
+    },
+    "Widths": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Widths" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "너비" } }
       }
     },
     "Before": {
@@ -312,6 +326,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "정리할 것이 없습니다."
+          }
+        }
+      }
+    },
+    "Cleaned %lld lines.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cleaned %lld lines."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld줄을 정리했습니다."
           }
         }
       }

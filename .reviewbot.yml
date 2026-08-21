@@ -8,6 +8,8 @@ review:
     - "**/*.pbxproj"
     - "**/*.xcstrings"
     - "**/*.xcassets/**/Contents.json"
+    - "**/Package.resolved"
+    - "**/Podfile.lock"
     - ".github/workflows/**/*.yml"
     - ".github/workflows/**/*.yaml"
     - ".reviewbot.yml"
@@ -66,10 +68,8 @@ review:
     - "**/*.mp4"
     - "**/*.mov"
 
-    # Machine-local files and dependency lock files
+    # Machine-local files
     - "**/.DS_Store"
-    - "**/Package.resolved"
-    - "Podfile.lock"
 
     # Intentionally malformed code used as a manual-cleaning sample
     - "Sample/**"

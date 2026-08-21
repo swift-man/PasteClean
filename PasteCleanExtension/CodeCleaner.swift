@@ -35,6 +35,11 @@ struct IndentationStyle {
 /// round trip added, and restates the indentation that is already there in the
 /// editor's own units.
 enum CodeCleaner {
+  struct LexicalState: Equatable {
+    var multilineStringHashCount: Int?
+    var blockCommentDepth = 0
+  }
+
   /// Longest run of blank lines the cleaner will leave behind.
   static let maximumConsecutiveBlankLines = 1
 
@@ -54,12 +59,16 @@ enum CodeCleaner {
     lines: [String],
     style: IndentationStyle,
     startsInsideMultilineString: Bool = false,
-    startingMultilineStringHashCount: Int? = nil
+    startingMultilineStringHashCount: Int? = nil,
+    startingLexicalState: LexicalState? = nil
   ) -> [String] {
+    let initialState = startingLexicalState ?? LexicalState(
+      multilineStringHashCount: startingMultilineStringHashCount
+        ?? (startsInsideMultilineString ? 0 : nil)
+    )
     let classified = classify(
       lines,
-      startingMultilineStringHashCount: startingMultilineStringHashCount
-        ?? (startsInsideMultilineString ? 0 : nil)
+      startingLexicalState: initialState
     )
     let dropsSingleBlankLines = isDoubleSpaced(classified)
     let plan = IndentationPlan(for: classified, style: style)
@@ -96,15 +105,19 @@ enum CodeCleaner {
   ///
   /// Pass the lines above the selection so a selection that starts in the
   /// middle of a `"""` literal is still recognised.
-  static func isInsideMultilineString(after lines: [String]) -> Bool {
+  static func isInsideMultilineString<S: Sequence>(after lines: S) -> Bool where S.Element == String {
     multilineStringHashCount(after: lines) != nil
   }
 
   /// Hash count of the raw multi-line string containing the next line, or
   /// `nil` when the next line is ordinary code. A plain `"""` literal uses 0.
-  static func multilineStringHashCount(after lines: [String]) -> Int? {
-    lines.reduce(nil as Int?) { state, line in
-      multilineStringHashCount(after: line, startingWith: state)
+  static func multilineStringHashCount<S: Sequence>(after lines: S) -> Int? where S.Element == String {
+    lexicalState(after: lines).multilineStringHashCount
+  }
+
+  static func lexicalState<S: Sequence>(after lines: S) -> LexicalState where S.Element == String {
+    lines.reduce(LexicalState(multilineStringHashCount: nil)) { state, line in
+      lexicalState(after: line, startingWith: state)
     }
   }
 
@@ -123,12 +136,12 @@ enum CodeCleaner {
   /// indentation defines how much whitespace Swift strips from the literal.
   private static func classify(
     _ lines: [String],
-    startingMultilineStringHashCount: Int?
+    startingLexicalState: LexicalState
   ) -> [Line] {
-    var hashCount = startingMultilineStringHashCount
+    var state = startingLexicalState
     return lines.map { text in
-      let wasInside = hashCount != nil
-      hashCount = multilineStringHashCount(after: text, startingWith: hashCount)
+      let wasInside = state.multilineStringHashCount != nil
+      state = lexicalState(after: text, startingWith: state)
       return Line(
         text: text,
         isInsideStringLiteral: wasInside,
@@ -271,44 +284,132 @@ enum CodeCleaner {
   /// Tracks Swift's plain and raw multi-line string delimiters through a line.
   /// Raw literals close only with the same number of hashes they opened with,
   /// so a bare `"""` inside `#""" ... """#` remains literal content.
-  private static func multilineStringHashCount(
+  private static func lexicalState(
     after line: String,
-    startingWith initialHashCount: Int?
-  ) -> Int? {
+    startingWith initialState: LexicalState
+  ) -> LexicalState {
     let characters = Array(line)
-    var hashCount = initialHashCount
+    var state = initialState
+    var singleLineStringHashCount: Int?
     var index = 0
 
-    while index + 3 <= characters.count {
-      guard characters[index] == "\"",
-            characters[index + 1] == "\"",
-            characters[index + 2] == "\""
-      else {
-        index += 1
-        continue
-      }
-
-      if let expectedHashes = hashCount {
+    while index < characters.count {
+      if let expectedHashes = state.multilineStringHashCount {
+        guard hasTripleQuote(in: characters, at: index) else {
+          index += 1
+          continue
+        }
+        guard isFirstNonWhitespaceToken(in: characters, at: index) else {
+          index += 3
+          continue
+        }
         let availableHashes = consecutiveHashes(in: characters, startingAt: index + 3)
-        let isEscapedPlainDelimiter = expectedHashes == 0
-          && hasOddBackslashRun(before: index, in: characters)
-        if availableHashes >= expectedHashes && !isEscapedPlainDelimiter {
-          hashCount = nil
+        let isEscapedDelimiter = expectedHashes == 0
+          ? hasOddBackslashRun(before: index, in: characters)
+          : hasRawEscapePrefix(before: index, hashCount: expectedHashes, in: characters)
+        if availableHashes >= expectedHashes && !isEscapedDelimiter {
+          state.multilineStringHashCount = nil
           index += 3 + expectedHashes
         } else {
           index += 3
         }
-      } else {
-        let openingHashes = consecutiveHashes(before: index, in: characters)
-        let isEscapedPlainDelimiter = openingHashes == 0
-          && hasOddBackslashRun(before: index, in: characters)
-        if !isEscapedPlainDelimiter {
-          hashCount = openingHashes
+        continue
+      }
+
+      if state.blockCommentDepth > 0 {
+        if hasPair("/", "*", in: characters, at: index) {
+          state.blockCommentDepth += 1
+          index += 2
+        } else if hasPair("*", "/", in: characters, at: index) {
+          state.blockCommentDepth -= 1
+          index += 2
+        } else {
+          index += 1
         }
+        continue
+      }
+
+      if let expectedHashes = singleLineStringHashCount {
+        guard characters[index] == "\"" else {
+          index += 1
+          continue
+        }
+        let availableHashes = consecutiveHashes(in: characters, startingAt: index + 1)
+        let isEscapedQuote = expectedHashes == 0
+          ? hasOddBackslashRun(before: index, in: characters)
+          : hasRawEscapePrefix(before: index, hashCount: expectedHashes, in: characters)
+        if availableHashes >= expectedHashes && !isEscapedQuote {
+          singleLineStringHashCount = nil
+          index += 1 + expectedHashes
+        } else {
+          index += 1
+        }
+        continue
+      }
+
+      if hasPair("/", "/", in: characters, at: index) {
+        break
+      }
+      if hasPair("/", "*", in: characters, at: index) {
+        state.blockCommentDepth = 1
+        index += 2
+        continue
+      }
+
+      guard characters[index] == "\"" else {
+        index += 1
+        continue
+      }
+
+      let openingHashes = consecutiveHashes(before: index, in: characters)
+      let isEscapedPlainQuote = openingHashes == 0
+        && hasOddBackslashRun(before: index, in: characters)
+      if isEscapedPlainQuote {
+        index += 1
+      } else if isMultilineOpeningDelimiter(in: characters, at: index) {
+        state.multilineStringHashCount = openingHashes
         index += 3
+      } else {
+        singleLineStringHashCount = openingHashes
+        index += 1
       }
     }
-    return hashCount
+    return state
+  }
+
+  private static func hasTripleQuote(in characters: [Character], at index: Int) -> Bool {
+    index + 2 < characters.count
+      && characters[index] == "\""
+      && characters[index + 1] == "\""
+      && characters[index + 2] == "\""
+  }
+
+  private static func isMultilineOpeningDelimiter(
+    in characters: [Character],
+    at index: Int
+  ) -> Bool {
+    guard hasTripleQuote(in: characters, at: index) else { return false }
+    return characters[(index + 3)...].allSatisfy {
+      $0 == " " || $0 == "\t" || $0.isNewline
+    }
+  }
+
+  private static func isFirstNonWhitespaceToken(
+    in characters: [Character],
+    at index: Int
+  ) -> Bool {
+    characters[..<index].allSatisfy { $0 == " " || $0 == "\t" }
+  }
+
+  private static func hasPair(
+    _ first: Character,
+    _ second: Character,
+    in characters: [Character],
+    at index: Int
+  ) -> Bool {
+    index + 1 < characters.count
+      && characters[index] == first
+      && characters[index + 1] == second
   }
 
   private static func consecutiveHashes(in characters: [Character], startingAt index: Int) -> Int {
@@ -330,6 +431,17 @@ enum CodeCleaner {
     var cursor = index
     while cursor > 0, characters[cursor - 1] == "\\" { cursor -= 1 }
     return (index - cursor).isMultiple(of: 2) == false
+  }
+
+  private static func hasRawEscapePrefix(
+    before index: Int,
+    hashCount: Int,
+    in characters: [Character]
+  ) -> Bool {
+    guard hashCount > 0, index > hashCount else { return false }
+    let hashesStart = index - hashCount
+    guard characters[hashesStart..<index].allSatisfy({ $0 == "#" }) else { return false }
+    return characters[hashesStart - 1] == "\\"
   }
 }
 

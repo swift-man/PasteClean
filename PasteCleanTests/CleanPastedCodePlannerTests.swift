@@ -66,6 +66,48 @@ struct CleanPastedCodePlannerTests {
     #expect(plan.resultingSelections == [range(from: (1, 0), to: (2, 1))])
   }
 
+  @Test("선택 끝 열은 이모지와 결합 문자를 UTF-16 단위로 계산한다", arguments: ["🙂", "e\u{301}"])
+  func usesUTF16ColumnsForResultSelection(_ value: String) throws {
+    let line = "let value = \"\(value)\""
+    let plan = try #require(CleanPastedCodePlan.make(
+      lines: [line + "  \n"],
+      selections: [range(from: (0, 0), to: (0, line.utf16.count + 2))],
+      style: .default
+    ))
+
+    #expect(plan.resultingSelections == [
+      range(from: (0, 0), to: (0, line.utf16.count))
+    ])
+  }
+
+  @Test("전체 정리에서 커서 앞의 빈 줄 제거량을 반영한다")
+  func mapsCaretsAcrossBlankRemoval() throws {
+    let plan = try #require(CleanPastedCodePlan.make(
+      lines: ["a\n", "\n", "b\n", "\n", "c\n", "d\n"],
+      selections: [
+        range(from: (2, 1), to: (2, 1)),
+        range(from: (4, 1), to: (4, 1)),
+      ],
+      style: .default
+    ))
+
+    #expect(plan.resultingSelections == [
+      range(from: (1, 1), to: (1, 1)),
+      range(from: (2, 1), to: (2, 1)),
+    ])
+  }
+
+  @Test("커서 뒤에서만 빈 줄이 제거되면 커서 위치를 유지한다")
+  func doesNotShiftCaretForBlankRemovalAfterIt() throws {
+    let plan = try #require(CleanPastedCodePlan.make(
+      lines: ["a\n", "b\n", "c\n", "\n", "d\n", "\n", "e\n", "\n", "f\n"],
+      selections: [range(from: (1, 1), to: (1, 1))],
+      style: .default
+    ))
+
+    #expect(plan.resultingSelections == [range(from: (1, 1), to: (1, 1))])
+  }
+
   @Test("겹치거나 맞닿은 선택은 합치고 떨어진 선택의 이동량을 보정한다")
   func mergesRangesAndShiftsLaterSelections() throws {
     let plan = try #require(CleanPastedCodePlan.make(
@@ -112,6 +154,30 @@ struct CleanPastedCodePlannerTests {
       CleanPastedCodePlan.Edit(
         originalRange: 1..<5,
         replacementLines: Array(literalLines[1..<5])
+      )
+    ])
+  }
+
+  @Test("블록 주석 안에서 시작하는 선택은 이후 실제 문자열 상태를 정확히 잇는다")
+  func inheritsBlockCommentStateForSelection() throws {
+    let lines = [
+      "/*\n",
+      "    \"\"\"\n",
+      "*/\n",
+      "let payload = \"\"\"\n",
+      "    keep   \n",
+      "    \"\"\"\n",
+    ]
+    let plan = try #require(CleanPastedCodePlan.make(
+      lines: lines,
+      selections: [range(from: (2, 0), to: (5, 0))],
+      style: .default
+    ))
+
+    #expect(plan.edits == [
+      CleanPastedCodePlan.Edit(
+        originalRange: 2..<5,
+        replacementLines: Array(lines[2..<5])
       )
     ])
   }

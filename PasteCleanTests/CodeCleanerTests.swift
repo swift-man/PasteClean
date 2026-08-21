@@ -262,6 +262,72 @@ struct CodeCleanerTests {
       ]
       #expect(CodeCleaner.clean(lines: raw, style: .default) == raw)
     }
+
+    @Test("주석 안의 구분자는 실제 여러 줄 문자열 상태를 바꾸지 않는다")
+    func ignoresDelimitersInsideComments() {
+      let lines = [
+        "/// docs mention \"\"\"",
+        "let payload = \"\"\"",
+        "    keep   ",
+        "",
+        "",
+        "    tail   ",
+        "    \"\"\"",
+        "let after = 1   ",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == [
+        "/// docs mention \"\"\"",
+        "let payload = \"\"\"",
+        "    keep   ",
+        "",
+        "",
+        "    tail   ",
+        "    \"\"\"",
+        "let after = 1",
+      ])
+      #expect(CodeCleaner.isInsideMultilineString(after: [
+        "/*",
+        "  /* nested \"\"\" */",
+        "  \"\"\"",
+        "*/",
+      ]) == false)
+    }
+
+    @Test("raw 한 줄 문자열의 연속 따옴표를 여러 줄 문자열로 오인하지 않는다")
+    func ignoresTripleQuotesInsideRawSingleLineString() {
+      #expect(CodeCleaner.isInsideMultilineString(
+        after: ["let marker = #\"\"\"\"\"#"]
+      ) == false)
+    }
+
+    @Test("raw 여러 줄 문자열의 이스케이프된 닫힘은 실제 닫힘까지 내용을 보존한다")
+    func ignoresEscapedRawMultilineCloser() {
+      let lines = [
+        "let value = #\"\"\"",
+        "    before",
+        "    \\#\"\"\"#",
+        "    after   ",
+        "    \"\"\"#",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == lines)
+    }
+
+    @Test("여러 줄 문자열 보간식 안의 raw 한 줄 문자열은 닫힘으로 오인하지 않는다")
+    func ignoresRawSingleLineStringInsideInterpolation() {
+      let lines = [
+        "let outer = \"\"\"",
+        "    \\(#\"\"\"\"\"#)",
+        "    keep   ",
+        "",
+        "",
+        "    tail   ",
+        "    \"\"\"",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == lines)
+    }
   }
 
   // MARK: - 들여쓰기

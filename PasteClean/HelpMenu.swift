@@ -38,7 +38,14 @@ enum HelpMenu {
   }
 
   private static var helpMenu: NSMenu? {
-    NSApp.mainMenu?.items.compactMap(\.submenu).first { $0.title == "Help" || $0.title == "도움말" }
+    if let menu = NSApp.helpMenu { return menu }
+
+    let submenus = NSApp.mainMenu?.items.compactMap(\.submenu) ?? []
+    let menu = submenus.first { submenu in
+      submenu.items.contains { $0.action == #selector(NSApplication.showHelp(_:)) }
+    }
+    if let menu { NSApp.helpMenu = menu }
+    return menu
   }
 
   fileprivate static let entries: [(title: String, topic: GuideTopic)] = [

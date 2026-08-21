@@ -201,9 +201,13 @@ struct ContentView: View {
     )
     output = cleaned.joined(separator: "\n")
     let removed = lines.count - cleaned.count
-    status = removed > 0
-      ? String(localized: "\(lines.count) lines → \(cleaned.count) lines, \(removed) blank removed")
-      : String(localized: "Nothing to clean.")
+    if removed > 0 {
+      status = String(localized: "\(lines.count) lines → \(cleaned.count) lines, \(removed) blank removed")
+    } else if output != input {
+      status = String(localized: "Cleaned \(cleaned.count) lines.")
+    } else {
+      status = String(localized: "Nothing to clean.")
+    }
   }
 
   /// ⌘V anywhere in the window drops the clipboard into the left pane and cleans it.

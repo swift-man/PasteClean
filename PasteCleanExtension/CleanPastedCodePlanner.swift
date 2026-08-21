@@ -52,8 +52,8 @@ struct CleanPastedCodePlan: Equatable {
         cleaned: CodeCleaner.clean(
           lines: originalLines[range].map(strippingLineEnding),
           style: style,
-          startingMultilineStringHashCount: CodeCleaner.multilineStringHashCount(
-            after: Array(originalLines[..<range.lowerBound])
+          startingLexicalState: CodeCleaner.lexicalState(
+            after: originalLines[..<range.lowerBound]
           )
         )
       )
@@ -72,12 +72,18 @@ struct CleanPastedCodePlan: Equatable {
 
     let resultingSelections: [EditorRange]
     if target.isWholeBuffer {
-      let finalLineCount = originalLines.count + edits.reduce(0) {
-        $0 + $1.replacementLines.count - $1.originalRange.count
+      let cleanedLines = cleanedTargets[0].cleaned
+      let carets = selections.isEmpty
+        ? [EditorPosition(line: 0, column: 0)]
+        : selections.map(\.start)
+      resultingSelections = carets.map { caret in
+        let position = mappedWholeBufferPosition(
+          caret,
+          originalLines: originalLines.map(strippingLineEnding),
+          cleanedLines: cleanedLines
+        )
+        return EditorRange(start: position, end: position)
       }
-      let line = min(max(selections.first?.start.line ?? 0, 0), max(finalLineCount - 1, 0))
-      let position = EditorPosition(line: line, column: 0)
-      resultingSelections = [EditorRange(start: position, end: position)]
     } else {
       var precedingLineDelta = 0
       resultingSelections = zip(cleanedTargets, edits).map { item, edit in
@@ -132,8 +138,56 @@ struct CleanPastedCodePlan: Equatable {
     let last = lines[lines.index(before: lines.endIndex)]
     return EditorRange(
       start: EditorPosition(line: line, column: 0),
-      end: EditorPosition(line: line + lines.count - 1, column: last.count)
+      end: EditorPosition(line: line + lines.count - 1, column: last.utf16.count)
     )
+  }
+
+  /// Keeps a caret attached to the same logical line when blank lines before
+  /// it are removed. Non-blank text is stable under cleaning after horizontal
+  /// whitespace is ignored, so a single forward alignment identifies every
+  /// retained source line without guessing from line-count deltas.
+  private static func mappedWholeBufferPosition(
+    _ position: EditorPosition,
+    originalLines: [String],
+    cleanedLines: [String]
+  ) -> EditorPosition {
+    guard !cleanedLines.isEmpty else { return EditorPosition(line: 0, column: 0) }
+
+    let originalLine = min(max(position.line, 0), originalLines.count - 1)
+    var mappings = Array<Int?>(repeating: nil, count: originalLines.count)
+    var sourceIndex = 0
+    var resultIndex = 0
+
+    while sourceIndex < originalLines.count, resultIndex < cleanedLines.count {
+      if comparableContent(originalLines[sourceIndex]) == comparableContent(cleanedLines[resultIndex]) {
+        mappings[sourceIndex] = resultIndex
+        sourceIndex += 1
+        resultIndex += 1
+      } else {
+        sourceIndex += 1
+      }
+    }
+
+    if let mappedLine = mappings[originalLine] {
+      return EditorPosition(
+        line: mappedLine,
+        column: min(max(position.column, 0), cleanedLines[mappedLine].utf16.count)
+      )
+    }
+
+    if let nextLine = mappings[(originalLine + 1)...].compactMap({ $0 }).first {
+      return EditorPosition(line: nextLine, column: 0)
+    }
+    let previousLine = mappings[..<originalLine].reversed().compactMap { $0 }.first
+      ?? cleanedLines.count - 1
+    return EditorPosition(
+      line: previousLine,
+      column: cleanedLines[previousLine].utf16.count
+    )
+  }
+
+  private static func comparableContent(_ line: String) -> String {
+    line.trimmingCharacters(in: .whitespaces)
   }
 
   // MARK: - Line endings
