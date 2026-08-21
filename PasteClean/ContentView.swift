@@ -14,9 +14,9 @@ import SwiftUI
 struct ContentView: View {
   @State private var input = ""
   @State private var output = ""
-  @State private var usesTabs = false
-  @State private var indentationWidth = 4
-  @State private var tabWidth = 4
+  @AppStorage("cleanerUsesTabs") private var usesTabs = false
+  @AppStorage("cleanerIndentationWidth") private var indentationWidth = 4
+  @AppStorage("cleanerTabWidth") private var tabWidth = 4
   @EnvironmentObject private var guide: GuideState
   @AppStorage("showsLineNumbers") private var showsLineNumbers = true
   @State private var status = ""
@@ -206,9 +206,12 @@ struct ContentView: View {
     output = cleaned.joined(separator: "\n")
     let removed = lines.count - cleaned.count
     if removed > 0 {
-      status = String(localized: "\(lines.count) lines → \(cleaned.count) lines, \(removed) blank removed")
+      let inputCount = Self.localizedLineCount(lines.count)
+      let outputCount = Self.localizedLineCount(cleaned.count)
+      let removedCount = Self.localizedBlankLineCount(removed)
+      status = String(localized: "\(inputCount) → \(outputCount), \(removedCount) removed")
     } else if output != input {
-      status = String(localized: "Cleaned \(cleaned.count) lines.")
+      status = String(localized: "Cleaned \(Self.localizedLineCount(cleaned.count)).")
     } else {
       status = String(localized: "Nothing to clean.")
     }
@@ -236,6 +239,14 @@ struct ContentView: View {
       .replacingOccurrences(of: "\r\n", with: "\n")
       .replacingOccurrences(of: "\r", with: "\n")
       .components(separatedBy: "\n")
+  }
+
+  private static func localizedLineCount(_ count: Int) -> String {
+    count == 1 ? String(localized: "1 line") : String(localized: "\(count) lines")
+  }
+
+  private static func localizedBlankLineCount(_ count: Int) -> String {
+    count == 1 ? String(localized: "1 blank line") : String(localized: "\(count) blank lines")
   }
 
   /// A paste out of a rendered Markdown code block: a blank line after every line.

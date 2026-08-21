@@ -296,19 +296,87 @@
         }
       }
     },
-    "%lld lines → %lld lines, %lld blank removed": {
+    "1 line": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld lines → %lld lines, %lld blank removed"
+            "value": "1 line"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld줄 → %lld줄 (빈 줄 %lld개 제거)"
+            "value": "1줄"
+          }
+        }
+      }
+    },
+    "%lld lines": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld lines"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld줄"
+          }
+        }
+      }
+    },
+    "1 blank line": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 blank line"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "빈 줄 1개"
+          }
+        }
+      }
+    },
+    "%lld blank lines": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld blank lines"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "빈 줄 %lld개"
+          }
+        }
+      }
+    },
+    "%@ → %@, %@ removed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ → %@, %@ removed"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ → %@ (%@ 제거)"
           }
         }
       }
@@ -330,19 +398,19 @@
         }
       }
     },
-    "Cleaned %lld lines.": {
+    "Cleaned %@.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cleaned %lld lines."
+            "value": "Cleaned %@."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld줄을 정리했습니다."
+            "value": "%@을 정리했습니다."
           }
         }
       }
