@@ -1,0 +1,84 @@
+version: 1
+
+review:
+  include:
+    - "**/*.swift"
+    - "**/*.plist"
+    - "**/*.entitlements"
+    - "**/*.pbxproj"
+    - "**/*.xcstrings"
+    - "**/*.xcassets/**/Contents.json"
+    - "**/Package.resolved"
+    - "**/Podfile.lock"
+    - ".github/workflows/**/*.yml"
+    - ".github/workflows/**/*.yaml"
+    - ".reviewbot.yml"
+    - ".coderabbit.yaml"
+    - ".gitignore"
+    - "AGENTS.md"
+    - "README.md"
+
+  exclude:
+    # Dependency and build output
+    - "Pods/**"
+    - "Carthage/**"
+    - "Dependencies/**"
+    - ".build/**"
+    - "DerivedData/**"
+    - "build/**"
+    - "dist/**"
+    - "vendor/**"
+    - ".swiftpm/xcode/**"
+
+    # Xcode local and generated metadata
+    - "**/xcuserdata/**"
+    - "**/*.xcuserstate"
+    - "**/*.xcscmblueprint"
+    - "**/*.xccheckout"
+    - "**/*.moved-aside"
+    - "**/*.pbxuser"
+    - "**/*.mode1v3"
+    - "**/*.mode2v3"
+    - "**/*.perspectivev3"
+    - "**/*.hmap"
+    - "**/*.ipa"
+    - "**/*.dSYM"
+    - "**/*.dSYM/**"
+    - "**/*.dSYM.zip"
+
+    # Generated source
+    - "**/Generated/**"
+    - "**/*.generated.swift"
+    - "**/*.pb.swift"
+    - "**/*.graphql.swift"
+    - "**/*+Generated.swift"
+
+    # Asset catalogs and binary resources
+    - "**/*.png"
+    - "**/*.jpg"
+    - "**/*.jpeg"
+    - "**/*.gif"
+    - "**/*.webp"
+    - "**/*.pdf"
+    - "**/*.mp3"
+    - "**/*.wav"
+    - "**/*.m4a"
+    - "**/*.caf"
+    - "**/*.aiff"
+    - "**/*.mp4"
+    - "**/*.mov"
+
+    # Machine-local files
+    - "**/.DS_Store"
+
+    # Intentionally malformed code used as a manual-cleaning sample
+    - "Sample/**"
+
+  always_review:
+    - ".reviewbot.yml"
+    - ".coderabbit.yaml"
+    - ".gitignore"
+    - "AGENTS.md"
+    - "README.md"
+    - ".github/workflows/**/*.yml"
+    - ".github/workflows/**/*.yaml"
