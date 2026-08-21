@@ -6,6 +6,7 @@ review:
     - "**/*.plist"
     - "**/*.entitlements"
     - "**/*.pbxproj"
+    - "**/*.xcstrings"
     - "**/*.xcassets/**/Contents.json"
     - ".github/workflows/**/*.yml"
     - ".github/workflows/**/*.yaml"
