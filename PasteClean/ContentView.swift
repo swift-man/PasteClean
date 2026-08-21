@@ -14,9 +14,9 @@ import SwiftUI
 struct ContentView: View {
   @State private var input = ""
   @State private var output = ""
-  @State private var usesTabs = false
-  @State private var indentationWidth = 4
-  @State private var tabWidth = 4
+  @AppStorage("cleanerUsesTabs") private var usesTabs = false
+  @AppStorage("cleanerIndentationWidth") private var indentationWidth = 4
+  @AppStorage("cleanerTabWidth") private var tabWidth = 4
   @EnvironmentObject private var guide: GuideState
   @AppStorage("showsLineNumbers") private var showsLineNumbers = true
   @State private var status = ""
@@ -92,7 +92,7 @@ struct ContentView: View {
         .help("Copy \(title)")
       }
       .padding(.horizontal, 10)
-      .padding(.vertical, 6)
+      .frame(height: Self.headerHeight)
       Divider()
       ZStack(alignment: .topLeading) {
         if text.wrappedValue.isEmpty {
@@ -133,6 +133,10 @@ struct ContentView: View {
   }
 
   /// Which character the cleaner writes indentation with.
+  ///
+  /// Only the app needs this control: inside Xcode the extension reads the
+  /// editor's own setting, so the help text explains the choice on its own
+  /// terms rather than naming a preference the reader may never have seen.
   private var indentCharacterPicker: some View {
     Picker("", selection: $usesTabs) {
       Text("Spaces").tag(false)
@@ -141,7 +145,7 @@ struct ContentView: View {
     .pickerStyle(.segmented)
     .frame(width: 130)
     .labelsHidden()
-    .help("Chooses which character indentation is written with. Matches Xcode's Indent Using setting.")
+    .help("Whether the cleaned code is indented with spaces or with tab characters. Match whatever the file you are pasting into already uses — mixing the two is what makes indentation look ragged.")
   }
 
   /// Laid out like Xcode's own indentation widths control.
@@ -152,7 +156,7 @@ struct ContentView: View {
       widthField(
         String(localized: "Tab"),
         value: $tabWidth,
-        help: String(localized: "How many columns one tab spans. Used to measure tabs in the pasted code, and to split the result when writing tabs.")
+        help: String(localized: "How many columns one tab counts as. Match the editor the code came from. This value measures tabs in the pasted code and, when Tabs is selected above, determines how many tabs and spaces are used to write the result.")
       )
       widthField(
         String(localized: "Indent"),
@@ -202,9 +206,12 @@ struct ContentView: View {
     output = cleaned.joined(separator: "\n")
     let removed = lines.count - cleaned.count
     if removed > 0 {
-      status = String(localized: "\(lines.count) lines → \(cleaned.count) lines, \(removed) blank removed")
+      let inputCount = Self.localizedLineCount(lines.count)
+      let outputCount = Self.localizedLineCount(cleaned.count)
+      let removedCount = Self.localizedBlankLineCount(removed)
+      status = String(localized: "\(inputCount) → \(outputCount), \(removedCount) removed")
     } else if output != input {
-      status = String(localized: "Cleaned \(cleaned.count) lines.")
+      status = String(localized: "Cleaned \(Self.localizedLineCount(cleaned.count)).")
     } else {
       status = String(localized: "Nothing to clean.")
     }
@@ -234,6 +241,14 @@ struct ContentView: View {
       .components(separatedBy: "\n")
   }
 
+  private static func localizedLineCount(_ count: Int) -> String {
+    count == 1 ? String(localized: "1 line") : String(localized: "\(count) lines")
+  }
+
+  private static func localizedBlankLineCount(_ count: Int) -> String {
+    count == 1 ? String(localized: "1 blank line") : String(localized: "\(count) blank lines")
+  }
+
   /// A paste out of a rendered Markdown code block: a blank line after every line.
   private static let inputPlaceholder = """
     private lazy var stackView = UIStackView(
@@ -255,4 +270,10 @@ struct ContentView: View {
 
   /// Matches `LineNumberRulerView.ruleThickness`.
   private static let gutterWidth: CGFloat = 38
+
+  /// Every pane header stands this tall whatever controls it carries, so the
+  /// rule beneath it — and with it the top of both editors — lines up across
+  /// the split. Sized for the tallest control any header holds: Output's
+  /// segmented picker, which is 24pt, plus 6pt of air above and below.
+  private static let headerHeight: CGFloat = 36
 }
