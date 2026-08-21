@@ -17,41 +17,53 @@ final class CleanPastedCodeCommand: NSObject, XCSourceEditorCommand {
     with invocation: XCSourceEditorCommandInvocation,
     completionHandler: @escaping (Error?) -> Void
   ) {
-    let buffer = invocation.buffer
-    let originalLines = buffer.lines.compactMap { $0 as? String }
-    let style = IndentationStyle(
+    CleanPastedCodeEditor.clean(XcodeSourceBufferAdapter(buffer: invocation.buffer))
+    completionHandler(nil)
+  }
+}
+
+private final class XcodeSourceBufferAdapter: CleanPastedCodeBuffer {
+  private let buffer: XCSourceTextBuffer
+
+  init(buffer: XCSourceTextBuffer) {
+    self.buffer = buffer
+  }
+
+  var lines: [String] {
+    buffer.lines.compactMap { $0 as? String }
+  }
+
+  var selections: [EditorRange] {
+    buffer.selections.compactMap { value in
+      guard let range = value as? XCSourceTextRange else { return nil }
+      return EditorRange(
+        start: EditorPosition(line: range.start.line, column: range.start.column),
+        end: EditorPosition(line: range.end.line, column: range.end.column)
+      )
+    }
+  }
+
+  var indentationStyle: IndentationStyle {
+    IndentationStyle(
       usesTabs: buffer.usesTabsForIndentation,
       indentationWidth: buffer.indentationWidth,
       tabWidth: buffer.tabWidth
     )
-    let originalSelections = buffer.selections.compactMap { $0 as? XCSourceTextRange }
-    let selections = originalSelections.map {
-      EditorRange(
-        start: EditorPosition(line: $0.start.line, column: $0.start.column),
-        end: EditorPosition(line: $0.end.line, column: $0.end.column)
-      )
-    }
-    guard let plan = CleanPastedCodePlan.make(
-      lines: originalLines,
-      selections: selections,
-      style: style
-    ) else { return completionHandler(nil) }
+  }
 
-    // Later ranges first: editing them leaves the line numbers of the
-    // earlier ranges — and of everything the prefix scan looks at — intact.
-    for edit in plan.edits.reversed() {
-      buffer.lines.replaceObjects(
-        in: NSRange(location: edit.originalRange.lowerBound, length: edit.originalRange.count),
-        withObjectsFrom: edit.replacementLines
-      )
-    }
+  func replaceLines(in range: Range<Int>, with replacementLines: [String]) {
+    buffer.lines.replaceObjects(
+      in: NSRange(location: range.lowerBound, length: range.count),
+      withObjectsFrom: replacementLines
+    )
+  }
 
-    buffer.selections.setArray(plan.resultingSelections.map {
+  func replaceSelections(with selections: [EditorRange]) {
+    buffer.selections.setArray(selections.map {
       XCSourceTextRange(
         start: XCSourceTextPosition(line: $0.start.line, column: $0.start.column),
         end: XCSourceTextPosition(line: $0.end.line, column: $0.end.column)
       )
     })
-    completionHandler(nil)
   }
 }

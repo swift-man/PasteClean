@@ -40,4 +40,9 @@ Run the unit tests with:
 xcodebuild -project PasteClean.xcodeproj -scheme PasteCleanTests -destination 'platform=macOS' test
 ```
 
+The suite includes a deterministic large-file regression check for multi-selection
+lexical scanning and an in-memory editor-buffer integration test that verifies edit
+ordering and resulting selections. Xcode extension discovery and the host's native
+undo UI still require a manual check inside Xcode.
+
 Localized in English and Korean.

@@ -47,15 +47,17 @@ struct CleanPastedCodePlan: Equatable {
 
     let contentLines = originalLines.map(strippingLineEnding)
     let defaultNewline = lineEnding(of: originalLines) ?? "\n"
-    let cleanedTargets = target.ranges.map { range in
+    var lexicalStateCursor = CodeCleaner.LexicalStateCursor()
+    let startingStates = target.ranges.map {
+      lexicalStateCursor.state(before: $0.lowerBound, in: contentLines)
+    }
+    let cleanedTargets = zip(target.ranges, startingStates).map { range, startingState in
       (
         original: range,
         cleaned: CodeCleaner.clean(
           lines: Array(contentLines[range]),
           style: style,
-          startingLexicalState: CodeCleaner.lexicalState(
-            after: contentLines[..<range.lowerBound]
-          )
+          startingLexicalState: startingState
         )
       )
     }
@@ -298,5 +300,34 @@ struct CleanPastedCodePlan: Equatable {
       if line.hasSuffix("\r") { return "\r" }
     }
     return nil
+  }
+}
+
+/// Minimal editor boundary shared by the XcodeKit adapter and integration tests.
+protocol CleanPastedCodeBuffer: AnyObject {
+  var lines: [String] { get }
+  var selections: [EditorRange] { get }
+  var indentationStyle: IndentationStyle { get }
+
+  func replaceLines(in range: Range<Int>, with replacementLines: [String])
+  func replaceSelections(with selections: [EditorRange])
+}
+
+/// Applies one cleaning transaction to an editor buffer.
+enum CleanPastedCodeEditor {
+  @discardableResult
+  static func clean(_ buffer: any CleanPastedCodeBuffer) -> Bool {
+    guard let plan = CleanPastedCodePlan.make(
+      lines: buffer.lines,
+      selections: buffer.selections,
+      style: buffer.indentationStyle
+    ) else { return false }
+
+    // Later ranges first so earlier line indexes stay valid for the transaction.
+    for edit in plan.edits.reversed() {
+      buffer.replaceLines(in: edit.originalRange, with: edit.replacementLines)
+    }
+    buffer.replaceSelections(with: plan.resultingSelections)
+    return true
   }
 }
