@@ -245,19 +245,19 @@
         }
       }
     },
-    "How many columns one tab counts as — a tab has no width of its own, so this decides it. Match the editor the code came from; with Tabs selected above, the result is written with tabs this wide too.": {
+    "How many columns one tab counts as. Match the editor the code came from. This value measures tabs in the pasted code and, when Tabs is selected above, determines how many tabs and spaces are used to write the result.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How many columns one tab counts as — a tab has no width of its own, so this decides it. Match the editor the code came from; with Tabs selected above, the result is written with tabs this wide too."
+            "value": "How many columns one tab counts as. Match the editor the code came from. This value measures tabs in the pasted code and, when Tabs is selected above, determines how many tabs and spaces are used to write the result."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "탭 하나를 몇 칸으로 계산할지 정합니다. 탭 자체에는 고정된 너비가 없으므로 원본 코드를 작성한 편집기에 맞추세요. 위에서 탭을 선택하면 결과도 이 너비의 탭으로 작성됩니다."
+            "value": "탭 하나를 몇 칸으로 계산할지 정합니다. 원본 코드를 작성한 편집기에 맞추세요. 붙여넣은 코드의 탭을 측정하고, 위에서 탭을 선택하면 결과를 몇 개의 탭과 공백으로 쓸지 계산하는 데 사용합니다."
           }
         }
       }
@@ -376,7 +376,7 @@
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@을 클립보드에 복사했습니다."
+            "value": "%@ 내용을 클립보드에 복사했습니다."
           }
         }
       }

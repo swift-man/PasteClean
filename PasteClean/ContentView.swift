@@ -156,7 +156,7 @@ struct ContentView: View {
       widthField(
         String(localized: "Tab"),
         value: $tabWidth,
-        help: String(localized: "How many columns one tab counts as — a tab has no width of its own, so this decides it. Match the editor the code came from; with Tabs selected above, the result is written with tabs this wide too.")
+        help: String(localized: "How many columns one tab counts as. Match the editor the code came from. This value measures tabs in the pasted code and, when Tabs is selected above, determines how many tabs and spaces are used to write the result.")
       )
       widthField(
         String(localized: "Indent"),
