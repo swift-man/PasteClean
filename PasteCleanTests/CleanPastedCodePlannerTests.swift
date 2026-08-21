@@ -108,6 +108,126 @@ struct CleanPastedCodePlannerTests {
     #expect(plan.resultingSelections == [range(from: (1, 1), to: (1, 1))])
   }
 
+  @Test("범위 선택과 섞인 빈 커서는 편집 전후의 논리 위치를 유지한다")
+  func preservesCaretsMixedWithRangeSelections() throws {
+    let plan = try #require(CleanPastedCodePlan.make(
+      lines: [
+        "before\n",
+        "let a = 1\n", "\n", "let b = 2\n",
+        "middle\n",
+        "let c = 3\n", "\n", "let d = 4\n",
+        "after\n",
+      ],
+      selections: [
+        range(from: (0, 3), to: (0, 3)),
+        range(from: (1, 0), to: (3, 9)),
+        range(from: (4, 2), to: (4, 2)),
+        range(from: (5, 0), to: (7, 9)),
+        range(from: (8, 2), to: (8, 2)),
+      ],
+      style: .default
+    ))
+
+    #expect(plan.resultingSelections == [
+      range(from: (0, 3), to: (0, 3)),
+      range(from: (1, 0), to: (2, 9)),
+      range(from: (3, 2), to: (3, 2)),
+      range(from: (4, 0), to: (5, 9)),
+      range(from: (6, 2), to: (6, 2)),
+    ])
+  }
+
+  @Test("선택 범위 안의 빈 커서도 들여쓰기 변환 뒤 같은 토큰을 가리킨다")
+  func mapsCaretInsideRangeSelectionAcrossIndentationChange() throws {
+    let plan = try #require(CleanPastedCodePlan.make(
+      lines: [
+        "func f() {\n",
+        "    if ready {\n",
+        "        value()\n",
+        "    }\n",
+        "}\n",
+      ],
+      selections: [
+        range(from: (0, 0), to: (4, 1)),
+        range(from: (2, 8), to: (2, 8)),
+        range(from: (2, 10), to: (2, 10)),
+      ],
+      style: IndentationStyle(usesTabs: false, indentationWidth: 2, tabWidth: 4)
+    ))
+
+    #expect(plan.resultingSelections == [
+      range(from: (0, 0), to: (4, 1)),
+      range(from: (2, 4), to: (2, 4)),
+      range(from: (2, 6), to: (2, 6)),
+    ])
+  }
+
+  @Test("정리 중 삭제된 빈 줄의 커서는 다음 줄, 없으면 이전 줄로 이동한다")
+  func mapsCaretsWhoseBlankLinesAreRemoved() throws {
+    let nextLinePlan = try #require(CleanPastedCodePlan.make(
+      lines: ["a\n", "\n", "\n", "b\n", "c\n"],
+      selections: [
+        range(from: (0, 0), to: (4, 1)),
+        range(from: (2, 0), to: (2, 0)),
+      ],
+      style: .default
+    ))
+    #expect(nextLinePlan.resultingSelections == [
+      range(from: (0, 0), to: (3, 1)),
+      range(from: (2, 0), to: (2, 0)),
+    ])
+
+    let previousLinePlan = try #require(CleanPastedCodePlan.make(
+      lines: ["a\n", "b\n", "\n", "\n"],
+      selections: [
+        range(from: (0, 0), to: (3, 1)),
+        range(from: (3, 0), to: (3, 0)),
+      ],
+      style: .default
+    ))
+    #expect(previousLinePlan.resultingSelections == [
+      range(from: (0, 0), to: (2, 0)),
+      range(from: (2, 0), to: (2, 0)),
+    ])
+  }
+
+  @Test("전체 정리의 커서는 스페이스 폭 변경과 탭 변환 뒤 같은 토큰을 가리킨다")
+  func mapsWholeBufferCaretsAcrossIndentationChanges() throws {
+    let spacesPlan = try #require(CleanPastedCodePlan.make(
+      lines: [
+        "func f() {\n",
+        "    if ready {\n",
+        "        value()\n",
+        "    }\n",
+        "}\n",
+      ],
+      selections: [
+        range(from: (1, 4), to: (1, 4)),
+        range(from: (2, 8), to: (2, 8)),
+        range(from: (2, 10), to: (2, 10)),
+      ],
+      style: IndentationStyle(usesTabs: false, indentationWidth: 2, tabWidth: 4)
+    ))
+    #expect(spacesPlan.resultingSelections == [
+      range(from: (1, 2), to: (1, 2)),
+      range(from: (2, 4), to: (2, 4)),
+      range(from: (2, 6), to: (2, 6)),
+    ])
+
+    let tabsPlan = try #require(CleanPastedCodePlan.make(
+      lines: ["func f() {\n", "  value()\n", "}\n"],
+      selections: [
+        range(from: (1, 2), to: (1, 2)),
+        range(from: (1, 4), to: (1, 4)),
+      ],
+      style: IndentationStyle(usesTabs: true, indentationWidth: 4, tabWidth: 4)
+    ))
+    #expect(tabsPlan.resultingSelections == [
+      range(from: (1, 1), to: (1, 1)),
+      range(from: (1, 3), to: (1, 3)),
+    ])
+  }
+
   @Test("겹치거나 맞닿은 선택은 합치고 떨어진 선택의 이동량을 보정한다")
   func mergesRangesAndShiftsLaterSelections() throws {
     let plan = try #require(CleanPastedCodePlan.make(

@@ -328,6 +328,129 @@ struct CodeCleanerTests {
 
       #expect(CodeCleaner.clean(lines: lines, style: .default) == lines)
     }
+
+    @Test("여러 줄 문자열 보간식의 중첩 여러 줄 문자열을 독립적으로 추적한다")
+    func preservesNestedMultilineStringInsideInterpolation() {
+      let lines = [
+        "func identity(_ value: String) -> String { value }",
+        "let outer = \"\"\"",
+        "    \\(identity(\"\"\"",
+        "        keep   ",
+        "",
+        "",
+        "        tail   ",
+        "        \"\"\"))",
+        "    outer tail   ",
+        "    \"\"\"",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == lines)
+      let state = CodeCleaner.lexicalState(after: lines)
+      #expect(state.multilineStringHashCount == nil)
+      #expect(state.multilineRegexHashCount == nil)
+      #expect(state.blockCommentDepth == 0)
+      #expect(state.stringInterpolations.isEmpty)
+    }
+
+    @Test("보간식이 닫힌 줄에서 이어지는 문자열 내용도 그대로 보존한다")
+    func preservesLiteralTailAfterInterpolationCloses() {
+      let lines = [
+        "let outer = \"\"\"",
+        "    \\(",
+        "        \"value\"",
+        "    )tail   ",
+        "    \"\"\"",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == lines)
+    }
+
+    @Test("한 줄 문자열 보간식의 따옴표와 괄호를 바깥 문자열 종료로 오인하지 않는다")
+    func preservesSingleLineInterpolationInsideMultilineInterpolation() {
+      let lines = [
+        "func f(_ s: String) -> String { s }",
+        "let outer = \"\"\"",
+        "    \\(",
+        "        \"nested \\(f(\")\"))\"",
+        "        + \"\"\"",
+        "            keep   ",
+        "",
+        "",
+        "            tail   ",
+        "            \"\"\"",
+        "    )",
+        "    outer tail   ",
+        "    \"\"\"",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == lines)
+      let state = CodeCleaner.lexicalState(after: lines)
+      #expect(state.multilineStringHashCount == nil)
+      #expect(state.multilineRegexHashCount == nil)
+      #expect(state.blockCommentDepth == 0)
+      #expect(state.stringInterpolations.isEmpty)
+    }
+
+    @Test("extended regex 내부의 주석 토큰은 이후 문자열 상태를 오염시키지 않는다")
+    func ignoresCommentTokensInsideExtendedRegex() {
+      let lines = [
+        "let blockPattern = #/foo/*bar/#",
+        "let linePattern = ##/foo//bar/##",
+        "let payload = \"\"\"",
+        "    keep   ",
+        "",
+        "",
+        "    tail   ",
+        "    \"\"\"",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == lines)
+      let state = CodeCleaner.lexicalState(after: Array(lines.prefix(2)))
+      #expect(state.multilineStringHashCount == nil)
+      #expect(state.multilineRegexHashCount == nil)
+      #expect(state.blockCommentDepth == 0)
+      #expect(state.stringInterpolations.isEmpty)
+    }
+
+    @Test("여러 줄 extended regex 내용은 공백과 주석 모양을 그대로 보존한다")
+    func preservesMultilineExtendedRegex() {
+      let lines = [
+        "let pattern = #/",
+        "    foo/*bar   ",
+        "",
+        "    baz//qux   ",
+        "    /#",
+        "let after = 1   ",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == [
+        "let pattern = #/",
+        "    foo/*bar   ",
+        "",
+        "    baz//qux   ",
+        "    /#",
+        "let after = 1",
+      ])
+    }
+
+    @Test("다중 hash regex는 짧거나 이스케이프된 닫힘에서 끝나지 않는다")
+    func distinguishesExtendedRegexClosers() {
+      let lines = [
+        "let pattern = ##/",
+        "    short /#   ",
+        "    escaped \\/##   ",
+        "    /##",
+        "let after = 1   ",
+      ]
+
+      #expect(CodeCleaner.clean(lines: lines, style: .default) == [
+        "let pattern = ##/",
+        "    short /#   ",
+        "    escaped \\/##   ",
+        "    /##",
+        "let after = 1",
+      ])
+    }
   }
 
   // MARK: - 들여쓰기

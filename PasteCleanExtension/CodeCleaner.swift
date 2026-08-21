@@ -36,8 +36,20 @@ struct IndentationStyle {
 /// editor's own units.
 enum CodeCleaner {
   struct LexicalState: Equatable {
+    enum StringContext: Equatable {
+      case multiline(hashCount: Int)
+      case singleLine(hashCount: Int)
+    }
+
+    struct StringInterpolation: Equatable {
+      var parent: StringContext
+      var parenthesisDepth: Int
+    }
+
     var multilineStringHashCount: Int?
+    var multilineRegexHashCount: Int?
     var blockCommentDepth = 0
+    var stringInterpolations: [StringInterpolation] = []
   }
 
   /// Longest run of blank lines the cleaner will leave behind.
@@ -117,7 +129,7 @@ enum CodeCleaner {
 
   static func lexicalState<S: Sequence>(after lines: S) -> LexicalState where S.Element == String {
     lines.reduce(LexicalState(multilineStringHashCount: nil)) { state, line in
-      lexicalState(after: line, startingWith: state)
+      lexicalScan(after: line, startingWith: state).state
     }
   }
 
@@ -140,11 +152,11 @@ enum CodeCleaner {
   ) -> [Line] {
     var state = startingLexicalState
     return lines.map { text in
-      let wasInside = state.multilineStringHashCount != nil
-      state = lexicalState(after: text, startingWith: state)
+      let scan = lexicalScan(after: text, startingWith: state)
+      state = scan.state
       return Line(
         text: text,
-        isInsideStringLiteral: wasInside,
+        isInsideStringLiteral: scan.containsProtectedLiteralContent,
         isBlank: text.trimmingCharacters(in: .whitespaces).isEmpty
       )
     }
@@ -284,17 +296,43 @@ enum CodeCleaner {
   /// Tracks Swift's plain and raw multi-line string delimiters through a line.
   /// Raw literals close only with the same number of hashes they opened with,
   /// so a bare `"""` inside `#""" ... """#` remains literal content.
-  private static func lexicalState(
+  private struct LexicalScan {
+    var state: LexicalState
+    var containsProtectedLiteralContent: Bool
+  }
+
+  private static func lexicalScan(
     after line: String,
     startingWith initialState: LexicalState
-  ) -> LexicalState {
+  ) -> LexicalScan {
     let characters = Array(line)
     var state = initialState
+    var containsProtectedLiteralContent =
+      initialState.multilineStringHashCount != nil
+      || initialState.multilineRegexHashCount != nil
+      || !initialState.stringInterpolations.isEmpty
     var singleLineStringHashCount: Int?
     var index = 0
 
     while index < characters.count {
       if let expectedHashes = state.multilineStringHashCount {
+        containsProtectedLiteralContent = true
+        if let interpolationLength = stringInterpolationOpeningLength(
+          in: characters,
+          at: index,
+          hashCount: expectedHashes
+        ) {
+          state.stringInterpolations.append(
+            LexicalState.StringInterpolation(
+              parent: .multiline(hashCount: expectedHashes),
+              parenthesisDepth: 1
+            )
+          )
+          state.multilineStringHashCount = nil
+          index += interpolationLength
+          continue
+        }
+
         guard hasTripleQuote(in: characters, at: index) else {
           index += 1
           continue
@@ -316,6 +354,22 @@ enum CodeCleaner {
         continue
       }
 
+      if let expectedHashes = state.multilineRegexHashCount {
+        containsProtectedLiteralContent = true
+        guard characters[index] == "/" else {
+          index += 1
+          continue
+        }
+        let availableHashes = consecutiveHashes(in: characters, startingAt: index + 1)
+        if availableHashes >= expectedHashes && !hasOddBackslashRun(before: index, in: characters) {
+          state.multilineRegexHashCount = nil
+          index += 1 + expectedHashes
+        } else {
+          index += 1
+        }
+        continue
+      }
+
       if state.blockCommentDepth > 0 {
         if hasPair("/", "*", in: characters, at: index) {
           state.blockCommentDepth += 1
@@ -330,6 +384,22 @@ enum CodeCleaner {
       }
 
       if let expectedHashes = singleLineStringHashCount {
+        if let interpolationLength = stringInterpolationOpeningLength(
+          in: characters,
+          at: index,
+          hashCount: expectedHashes
+        ) {
+          state.stringInterpolations.append(
+            LexicalState.StringInterpolation(
+              parent: .singleLine(hashCount: expectedHashes),
+              parenthesisDepth: 1
+            )
+          )
+          singleLineStringHashCount = nil
+          index += interpolationLength
+          continue
+        }
+
         guard characters[index] == "\"" else {
           index += 1
           continue
@@ -347,6 +417,16 @@ enum CodeCleaner {
         continue
       }
 
+      let regexHashes = consecutiveHashes(in: characters, startingAt: index)
+      if regexHashes > 0,
+         index + regexHashes < characters.count,
+         characters[index + regexHashes] == "/"
+      {
+        state.multilineRegexHashCount = regexHashes
+        index += regexHashes + 1
+        continue
+      }
+
       if hasPair("/", "/", in: characters, at: index) {
         break
       }
@@ -354,6 +434,29 @@ enum CodeCleaner {
         state.blockCommentDepth = 1
         index += 2
         continue
+      }
+
+      if !state.stringInterpolations.isEmpty {
+        if characters[index] == "(" {
+          state.stringInterpolations[state.stringInterpolations.count - 1].parenthesisDepth += 1
+          index += 1
+          continue
+        }
+        if characters[index] == ")" {
+          let contextIndex = state.stringInterpolations.count - 1
+          state.stringInterpolations[contextIndex].parenthesisDepth -= 1
+          if state.stringInterpolations[contextIndex].parenthesisDepth == 0 {
+            let context = state.stringInterpolations.removeLast()
+            switch context.parent {
+            case .multiline(let hashCount):
+              state.multilineStringHashCount = hashCount
+            case .singleLine(let hashCount):
+              singleLineStringHashCount = hashCount
+            }
+          }
+          index += 1
+          continue
+        }
       }
 
       guard characters[index] == "\"" else {
@@ -368,13 +471,16 @@ enum CodeCleaner {
         index += 1
       } else if isMultilineOpeningDelimiter(in: characters, at: index) {
         state.multilineStringHashCount = openingHashes
-        index += 3
+        index = characters.count
       } else {
         singleLineStringHashCount = openingHashes
         index += 1
       }
     }
-    return state
+    return LexicalScan(
+      state: state,
+      containsProtectedLiteralContent: containsProtectedLiteralContent
+    )
   }
 
   private static func hasTripleQuote(in characters: [Character], at index: Int) -> Bool {
@@ -382,6 +488,24 @@ enum CodeCleaner {
       && characters[index] == "\""
       && characters[index + 1] == "\""
       && characters[index + 2] == "\""
+  }
+
+  private static func stringInterpolationOpeningLength(
+    in characters: [Character],
+    at index: Int,
+    hashCount: Int
+  ) -> Int? {
+    guard characters[index] == "\\" else { return nil }
+    let openingLength = hashCount + 2
+    guard index + openingLength <= characters.count else { return nil }
+    if hashCount == 0 {
+      guard hasOddBackslashRun(through: index, in: characters) else { return nil }
+    } else {
+      guard characters[(index + 1)..<(index + 1 + hashCount)].allSatisfy({ $0 == "#" })
+      else { return nil }
+    }
+    guard characters[index + 1 + hashCount] == "(" else { return nil }
+    return openingLength
   }
 
   private static func isMultilineOpeningDelimiter(
@@ -431,6 +555,12 @@ enum CodeCleaner {
     var cursor = index
     while cursor > 0, characters[cursor - 1] == "\\" { cursor -= 1 }
     return (index - cursor).isMultiple(of: 2) == false
+  }
+
+  private static func hasOddBackslashRun(through index: Int, in characters: [Character]) -> Bool {
+    var cursor = index + 1
+    while cursor > 0, characters[cursor - 1] == "\\" { cursor -= 1 }
+    return (index + 1 - cursor).isMultiple(of: 2) == false
   }
 
   private static func hasRawEscapePrefix(

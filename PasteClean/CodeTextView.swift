@@ -173,8 +173,8 @@ final class LineNumberRulerView: NSRulerView {
       if location > NSMaxRange(visible) { return }
     }
 
-    // A trailing newline leaves the caret on one more, empty line.
-    if content.character(at: content.length - 1) == 10 {
+    // Any trailing line terminator leaves the caret on one more, empty line.
+    if textView.string.last?.isNewline == true {
       draw(number, in: layoutManager.extraLineFragmentRect)
     }
   }

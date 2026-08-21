@@ -45,15 +45,16 @@ struct CleanPastedCodePlan: Equatable {
     let target = target(for: selections, lineCount: originalLines.count)
     guard !target.ranges.isEmpty else { return nil }
 
+    let contentLines = originalLines.map(strippingLineEnding)
     let defaultNewline = lineEnding(of: originalLines) ?? "\n"
     let cleanedTargets = target.ranges.map { range in
       (
         original: range,
         cleaned: CodeCleaner.clean(
-          lines: originalLines[range].map(strippingLineEnding),
+          lines: Array(contentLines[range]),
           style: style,
           startingLexicalState: CodeCleaner.lexicalState(
-            after: originalLines[..<range.lowerBound]
+            after: contentLines[..<range.lowerBound]
           )
         )
       )
@@ -77,21 +78,46 @@ struct CleanPastedCodePlan: Equatable {
         ? [EditorPosition(line: 0, column: 0)]
         : selections.map(\.start)
       resultingSelections = carets.map { caret in
-        let position = mappedWholeBufferPosition(
+        let position = mappedPosition(
           caret,
-          originalLines: originalLines.map(strippingLineEnding),
+          originalLines: contentLines,
           cleanedLines: cleanedLines
         )
         return EditorRange(start: position, end: position)
       }
     } else {
       var precedingLineDelta = 0
-      resultingSelections = zip(cleanedTargets, edits).map { item, edit in
+      let mappedTargets = zip(cleanedTargets, edits).map { item, edit in
         defer { precedingLineDelta += edit.replacementLines.count - item.original.count }
-        return selection(
-          startingAt: item.original.lowerBound + precedingLineDelta,
-          covering: item.cleaned
+        return (
+          original: item.original,
+          selection: selection(
+            startingAt: item.original.lowerBound + precedingLineDelta,
+            covering: item.cleaned
+          )
         )
+      }
+
+      var emittedRanges: [Range<Int>] = []
+      resultingSelections = selections.compactMap { originalSelection in
+        if originalSelection.isEmpty {
+          let position = mappedPosition(
+            originalSelection.start,
+            through: cleanedTargets,
+            originalLines: contentLines
+          )
+          return EditorRange(start: position, end: position)
+        }
+
+        guard let range = lineRange(for: originalSelection, lineCount: originalLines.count),
+              let mappedTarget = mappedTargets.first(where: {
+                $0.original.lowerBound <= range.lowerBound
+                  && range.upperBound <= $0.original.upperBound
+              }),
+              !emittedRanges.contains(mappedTarget.original)
+        else { return nil }
+        emittedRanges.append(mappedTarget.original)
+        return mappedTarget.selection
       }
     }
 
@@ -111,15 +137,7 @@ struct CleanPastedCodePlan: Equatable {
       return Target(ranges: [0..<lineCount], isWholeBuffer: true)
     }
 
-    var ranges: [Range<Int>] = []
-    for selection in nonEmpty {
-      let start = max(0, selection.start.line)
-      var end = selection.end.line
-      if selection.end.column == 0 && end > start { end -= 1 }
-      end = min(end, lineCount - 1)
-      guard start <= end, start < lineCount else { continue }
-      ranges.append(start..<(end + 1))
-    }
+    let ranges = nonEmpty.compactMap { lineRange(for: $0, lineCount: lineCount) }
 
     let merged = ranges.sorted { $0.lowerBound < $1.lowerBound }
       .reduce(into: [Range<Int>]()) { merged, range in
@@ -130,6 +148,18 @@ struct CleanPastedCodePlan: Equatable {
         }
       }
     return Target(ranges: merged, isWholeBuffer: false)
+  }
+
+  private static func lineRange(
+    for selection: EditorRange,
+    lineCount: Int
+  ) -> Range<Int>? {
+    let start = max(0, selection.start.line)
+    var end = selection.end.line
+    if selection.end.column == 0 && end > start { end -= 1 }
+    end = min(end, lineCount - 1)
+    guard start <= end, start < lineCount else { return nil }
+    return start..<(end + 1)
   }
 
   private static func selection(startingAt line: Int, covering lines: [String]) -> EditorRange {
@@ -146,7 +176,7 @@ struct CleanPastedCodePlan: Equatable {
   /// it are removed. Non-blank text is stable under cleaning after horizontal
   /// whitespace is ignored, so a single forward alignment identifies every
   /// retained source line without guessing from line-count deltas.
-  private static func mappedWholeBufferPosition(
+  private static func mappedPosition(
     _ position: EditorPosition,
     originalLines: [String],
     cleanedLines: [String]
@@ -171,7 +201,11 @@ struct CleanPastedCodePlan: Equatable {
     if let mappedLine = mappings[originalLine] {
       return EditorPosition(
         line: mappedLine,
-        column: min(max(position.column, 0), cleanedLines[mappedLine].utf16.count)
+        column: mappedColumn(
+          position.column,
+          from: originalLines[originalLine],
+          to: cleanedLines[mappedLine]
+        )
       )
     }
 
@@ -184,6 +218,66 @@ struct CleanPastedCodePlan: Equatable {
       line: previousLine,
       column: cleanedLines[previousLine].utf16.count
     )
+  }
+
+  /// Moves a caret through the selected edits while leaving unedited text in
+  /// place. A caret inside an edit uses the same logical-line and indentation
+  /// mapping as whole-buffer cleanup; a caret after it only receives its line
+  /// count delta.
+  private static func mappedPosition(
+    _ position: EditorPosition,
+    through cleanedTargets: [(original: Range<Int>, cleaned: [String])],
+    originalLines: [String]
+  ) -> EditorPosition {
+    let originalLine = min(max(position.line, 0), originalLines.count - 1)
+    var precedingLineDelta = 0
+
+    for target in cleanedTargets {
+      if originalLine < target.original.lowerBound { break }
+      if originalLine >= target.original.upperBound {
+        precedingLineDelta += target.cleaned.count - target.original.count
+        continue
+      }
+
+      let localPosition = EditorPosition(
+        line: originalLine - target.original.lowerBound,
+        column: position.column
+      )
+      let mapped = mappedPosition(
+        localPosition,
+        originalLines: Array(originalLines[target.original]),
+        cleanedLines: target.cleaned
+      )
+      return EditorPosition(
+        line: target.original.lowerBound + precedingLineDelta + mapped.line,
+        column: mapped.column
+      )
+    }
+
+    return EditorPosition(
+      line: originalLine + precedingLineDelta,
+      column: min(max(position.column, 0), originalLines[originalLine].utf16.count)
+    )
+  }
+
+  /// Keeps a caret attached to the same character in the code body when the
+  /// cleaner rewrites leading whitespace. Columns inside indentation remain
+  /// inside the rewritten indentation, and trailing-whitespace positions clamp
+  /// to the cleaned line end.
+  private static func mappedColumn(
+    _ column: Int,
+    from originalLine: String,
+    to cleanedLine: String
+  ) -> Int {
+    let sourceColumn = min(max(column, 0), originalLine.utf16.count)
+    let sourceIndent = leadingWhitespaceUTF16Count(originalLine)
+    let cleanedIndent = leadingWhitespaceUTF16Count(cleanedLine)
+    guard sourceColumn >= sourceIndent else { return min(sourceColumn, cleanedIndent) }
+    return min(cleanedIndent + sourceColumn - sourceIndent, cleanedLine.utf16.count)
+  }
+
+  private static func leadingWhitespaceUTF16Count(_ line: String) -> Int {
+    line.prefix { $0 == " " || $0 == "\t" }.utf16.count
   }
 
   private static func comparableContent(_ line: String) -> String {
