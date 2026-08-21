@@ -1,0 +1,594 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		013722F812757E07AA5E2606 /* PasteCleanApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FEB5546B04AC858081476F /* PasteCleanApp.swift */; };
+		0320B6E66375EEEEC74290DE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EC407E4DFB45DA192EC0CA /* ContentView.swift */; };
+		AA0300000000000000000001 /* GuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0300000000000000000002 /* GuideView.swift */; };
+		AA0400000000000000000001 /* CodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0400000000000000000002 /* CodeTextView.swift */; };
+		AA0500000000000000000001 /* HelpMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0500000000000000000002 /* HelpMenu.swift */; };
+		05D6C9107CE4A611655D4572 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 06A922D9CB208DABFF6AC0BE /* Assets.xcassets */; };
+		AA0600000000000000000001 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AA0600000000000000000002 /* Localizable.xcstrings */; };
+		07F8369F4D14F5E705953B51 /* PasteCleanExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 08BA7964369EE482271FEAED /* PasteCleanExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0904F570506DE3D6D611EB2E /* SourceEditorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A22BFFCF1D879F19C99F5FA /* SourceEditorExtension.swift */; };
+		0BCCCB4C6376BA04A1412DB5 /* CleanPastedCodeCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7EB8EBE3D4B5F5F2E16A94 /* CleanPastedCodeCommand.swift */; };
+		0D6B2616605398F18B8494FE /* CodeCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */; };
+		AA0700000000000000000001 /* CleanPastedCodePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0700000000000000000004 /* CleanPastedCodePlanner.swift */; };
+		AA0700000000000000000002 /* CleanPastedCodePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0700000000000000000004 /* CleanPastedCodePlanner.swift */; };
+		AA0700000000000000000003 /* CleanPastedCodePlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0700000000000000000005 /* CleanPastedCodePlannerTests.swift */; };
+		AA0200000000000000000001 /* CodeCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */; };
+		0F1A8A5907F8429FD27AE19F /* XcodeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10E6DA89C1E917289EB1C39C /* XcodeKit.framework */; };
+		30A1B4C7E2D5F08931746A2B /* CodeCleanerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E5A97B1C4D60F83A2B7E15 /* CodeCleanerTests.swift */; };
+		31C8D0F3A6B94E27051D8C3A /* CodeCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		114D8722B9580D86F13BEC29 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1216EEAF57BAFC2A41CAB7C9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 13CAD0AB91402D35CC079C59;
+			remoteInfo = PasteCleanExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		14F4E97D206BEDF00FBDE7BD /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				07F8369F4D14F5E705953B51 /* PasteCleanExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		02FEB5546B04AC858081476F /* PasteCleanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteCleanApp.swift; sourceTree = "<group>"; };
+		04EC407E4DFB45DA192EC0CA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AA0300000000000000000002 /* GuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideView.swift; sourceTree = "<group>"; };
+		AA0400000000000000000002 /* CodeTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTextView.swift; sourceTree = "<group>"; };
+		AA0500000000000000000002 /* HelpMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpMenu.swift; sourceTree = "<group>"; };
+		06A922D9CB208DABFF6AC0BE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA0600000000000000000002 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		08BA7964369EE482271FEAED /* PasteCleanExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PasteCleanExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A22BFFCF1D879F19C99F5FA /* SourceEditorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceEditorExtension.swift; sourceTree = "<group>"; };
+		0C7EB8EBE3D4B5F5F2E16A94 /* CleanPastedCodeCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPastedCodeCommand.swift; sourceTree = "<group>"; };
+		0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeCleaner.swift; sourceTree = "<group>"; };
+		AA0700000000000000000004 /* CleanPastedCodePlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPastedCodePlanner.swift; sourceTree = "<group>"; };
+		AA0700000000000000000005 /* CleanPastedCodePlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPastedCodePlannerTests.swift; sourceTree = "<group>"; };
+		10E6DA89C1E917289EB1C39C /* XcodeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XcodeKit.framework; path = Library/Frameworks/XcodeKit.framework; sourceTree = DEVELOPER_DIR; };
+		158F69C61A45E28A99C09C28 /* PasteClean.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PasteClean.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		16F98C1F8A090D5206875B73 /* PasteClean.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PasteClean.entitlements; sourceTree = "<group>"; };
+		174776D1BF305E9154517B06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		18C11409371F2684FC0EAB93 /* PasteCleanExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PasteCleanExtension.entitlements; sourceTree = "<group>"; };
+		19C667AA09E565BED3F4E7EF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		32E5A97B1C4D60F83A2B7E15 /* CodeCleanerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeCleanerTests.swift; sourceTree = "<group>"; };
+		33B70D2E9F58A14C6E03D7B9 /* PasteCleanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PasteCleanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1AD276783B77BE35A481AEB4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1B6790D7B8048983BCB33A18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F1A8A5907F8429FD27AE19F /* XcodeKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		374E9C0B26A8D5F13098C74E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1C18F6DBDF541897A0BF0C3F = {
+			isa = PBXGroup;
+			children = (
+				19C667AA09E565BED3F4E7EF /* README.md */,
+				1D9A77D8E85D38B742B32E19 /* PasteClean */,
+				1EE076BFD3B4F04CB083F039 /* PasteCleanExtension */,
+				34D19E6A0B37C5F2481A9E64 /* PasteCleanTests */,
+				1F51C870B1D8768D4C4F6C53 /* Frameworks */,
+				20E962EB3E5D42BCC1729EE1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1D9A77D8E85D38B742B32E19 /* PasteClean */ = {
+			isa = PBXGroup;
+			children = (
+				02FEB5546B04AC858081476F /* PasteCleanApp.swift */,
+				04EC407E4DFB45DA192EC0CA /* ContentView.swift */,
+				AA0300000000000000000002 /* GuideView.swift */,
+				AA0400000000000000000002 /* CodeTextView.swift */,
+				AA0500000000000000000002 /* HelpMenu.swift */,
+				06A922D9CB208DABFF6AC0BE /* Assets.xcassets */,
+				AA0600000000000000000002 /* Localizable.xcstrings */,
+				16F98C1F8A090D5206875B73 /* PasteClean.entitlements */,
+			);
+			path = PasteClean;
+			sourceTree = "<group>";
+		};
+		1EE076BFD3B4F04CB083F039 /* PasteCleanExtension */ = {
+			isa = PBXGroup;
+			children = (
+				0A22BFFCF1D879F19C99F5FA /* SourceEditorExtension.swift */,
+				0C7EB8EBE3D4B5F5F2E16A94 /* CleanPastedCodeCommand.swift */,
+				AA0700000000000000000004 /* CleanPastedCodePlanner.swift */,
+				0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */,
+				174776D1BF305E9154517B06 /* Info.plist */,
+				18C11409371F2684FC0EAB93 /* PasteCleanExtension.entitlements */,
+			);
+			path = PasteCleanExtension;
+			sourceTree = "<group>";
+		};
+		1F51C870B1D8768D4C4F6C53 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				10E6DA89C1E917289EB1C39C /* XcodeKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		20E962EB3E5D42BCC1729EE1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				158F69C61A45E28A99C09C28 /* PasteClean.app */,
+				08BA7964369EE482271FEAED /* PasteCleanExtension.appex */,
+				33B70D2E9F58A14C6E03D7B9 /* PasteCleanTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		34D19E6A0B37C5F2481A9E64 /* PasteCleanTests */ = {
+			isa = PBXGroup;
+			children = (
+				32E5A97B1C4D60F83A2B7E15 /* CodeCleanerTests.swift */,
+				AA0700000000000000000005 /* CleanPastedCodePlannerTests.swift */,
+			);
+			path = PasteCleanTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		13CAD0AB91402D35CC079C59 /* PasteCleanExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 266D17F97AEDCB9CEA5F47C1 /* Build configuration list for PBXNativeTarget "PasteCleanExtension" */;
+			buildPhases = (
+				2733F7BA9E692353B9C4327F /* Sources */,
+				1B6790D7B8048983BCB33A18 /* Frameworks */,
+				28B19E8EE4BE487FF93FDF6E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PasteCleanExtension;
+			productName = PasteCleanExtension;
+			productReference = 08BA7964369EE482271FEAED /* PasteCleanExtension.appex */;
+			productType = "com.apple.product-type.xcode-extension";
+		};
+		214463214C206F029C3B6CF9 /* PasteClean */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2281F49444CB2F6C145A55E6 /* Build configuration list for PBXNativeTarget "PasteClean" */;
+			buildPhases = (
+				23C03C272E5BF7CCF7D84A1E /* Sources */,
+				1AD276783B77BE35A481AEB4 /* Frameworks */,
+				24C85DFF4582FDDB8F56CCDC /* Resources */,
+				14F4E97D206BEDF00FBDE7BD /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2521254882B7825D3C211AC4 /* PBXTargetDependency */,
+			);
+			name = PasteClean;
+			productName = PasteClean;
+			productReference = 158F69C61A45E28A99C09C28 /* PasteClean.app */;
+			productType = "com.apple.product-type.application";
+		};
+		35F2C81D4A0E76B93C5D2081 /* PasteCleanTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3B7A2F5E0C6D18B94E30F7A1 /* Build configuration list for PBXNativeTarget "PasteCleanTests" */;
+			buildPhases = (
+				360B5A3F8D14E9C207B6F35D /* Sources */,
+				374E9C0B26A8D5F13098C74E /* Frameworks */,
+				38A6F14D9B02E7C583D1046F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PasteCleanTests;
+			productName = PasteCleanTests;
+			productReference = 33B70D2E9F58A14C6E03D7B9 /* PasteCleanTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1216EEAF57BAFC2A41CAB7C9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					13CAD0AB91402D35CC079C59 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					214463214C206F029C3B6CF9 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					35F2C81D4A0E76B93C5D2081 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+				};
+			};
+			buildConfigurationList = 294C6B16A815E984A1FD8C03 /* Build configuration list for PBXProject "PasteClean" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				ko,
+				Base,
+			);
+			mainGroup = 1C18F6DBDF541897A0BF0C3F;
+			productRefGroup = 20E962EB3E5D42BCC1729EE1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				214463214C206F029C3B6CF9 /* PasteClean */,
+				13CAD0AB91402D35CC079C59 /* PasteCleanExtension */,
+				35F2C81D4A0E76B93C5D2081 /* PasteCleanTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		24C85DFF4582FDDB8F56CCDC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05D6C9107CE4A611655D4572 /* Assets.xcassets in Resources */,
+				AA0600000000000000000001 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		28B19E8EE4BE487FF93FDF6E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		38A6F14D9B02E7C583D1046F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		23C03C272E5BF7CCF7D84A1E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0320B6E66375EEEEC74290DE /* ContentView.swift in Sources */,
+				AA0300000000000000000001 /* GuideView.swift in Sources */,
+				AA0400000000000000000001 /* CodeTextView.swift in Sources */,
+				AA0500000000000000000001 /* HelpMenu.swift in Sources */,
+				013722F812757E07AA5E2606 /* PasteCleanApp.swift in Sources */,
+				AA0200000000000000000001 /* CodeCleaner.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2733F7BA9E692353B9C4327F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D6B2616605398F18B8494FE /* CodeCleaner.swift in Sources */,
+				AA0700000000000000000001 /* CleanPastedCodePlanner.swift in Sources */,
+				0BCCCB4C6376BA04A1412DB5 /* CleanPastedCodeCommand.swift in Sources */,
+				0904F570506DE3D6D611EB2E /* SourceEditorExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		360B5A3F8D14E9C207B6F35D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30A1B4C7E2D5F08931746A2B /* CodeCleanerTests.swift in Sources */,
+				31C8D0F3A6B94E27051D8C3A /* CodeCleaner.swift in Sources */,
+				AA0700000000000000000002 /* CleanPastedCodePlanner.swift in Sources */,
+				AA0700000000000000000003 /* CleanPastedCodePlannerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2521254882B7825D3C211AC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 13CAD0AB91402D35CC079C59 /* PasteCleanExtension */;
+			targetProxy = 114D8722B9580D86F13BEC29 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2A0C6A46DE5CA5D8877C89A5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		2B005057041638E3EEDECD73 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		2CA7D5D50E2CCDA79B7F9F20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PasteClean/PasteClean.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y7YQUS95SK;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PasteClean;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.gorani.PasteClean;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		2D63677A37EFA635F211C06B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PasteClean/PasteClean.entitlements;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y7YQUS95SK;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PasteClean;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.gorani.PasteClean;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		2EFA37D8B6440294DBC75C81 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PasteCleanExtension/PasteCleanExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y7YQUS95SK;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Library/Frameworks",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PasteCleanExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PasteClean;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.gorani.PasteClean.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		2F85A720C7383E3B5D62CC6E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PasteCleanExtension/PasteCleanExtension.entitlements;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y7YQUS95SK;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Library/Frameworks",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PasteCleanExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PasteClean;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.gorani.PasteClean.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		39C3E70A5F81B4D26A97E502 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y7YQUS95SK;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.gorani.PasteCleanTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+			};
+			name = Debug;
+		};
+		3A0D8B62C4E93F70185AB2C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y7YQUS95SK;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.gorani.PasteCleanTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2281F49444CB2F6C145A55E6 /* Build configuration list for PBXNativeTarget "PasteClean" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2CA7D5D50E2CCDA79B7F9F20 /* Debug */,
+				2D63677A37EFA635F211C06B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		266D17F97AEDCB9CEA5F47C1 /* Build configuration list for PBXNativeTarget "PasteCleanExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2EFA37D8B6440294DBC75C81 /* Debug */,
+				2F85A720C7383E3B5D62CC6E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		294C6B16A815E984A1FD8C03 /* Build configuration list for PBXProject "PasteClean" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2A0C6A46DE5CA5D8877C89A5 /* Debug */,
+				2B005057041638E3EEDECD73 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3B7A2F5E0C6D18B94E30F7A1 /* Build configuration list for PBXNativeTarget "PasteCleanTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39C3E70A5F81B4D26A97E502 /* Debug */,
+				3A0D8B62C4E93F70185AB2C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1216EEAF57BAFC2A41CAB7C9 /* Project object */;
+}

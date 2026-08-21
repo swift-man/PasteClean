@@ -1,0 +1,830 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "Input": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Input" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "입력" } }
+      }
+    },
+    "Output": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Output" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "결과" } }
+      }
+    },
+    "Tab": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Tab" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "탭 너비" } }
+      }
+    },
+    "Indent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Indent" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "들여쓰기" } }
+      }
+    },
+    "Before": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Before" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "정리 전" } }
+      }
+    },
+    "After": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "After" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "정리 후" } }
+      }
+    },
+    "Paste ⌘V → Clean ⌥O → Copy from the right": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste ⌘V → Clean ⌥O → Copy from the right"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "붙여넣기 ⌘V → 정리 ⌥O → 오른쪽에서 복사"
+          }
+        }
+      }
+    },
+    "Removes blank lines and trailing whitespace, then rewrites indentation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removes blank lines and trailing whitespace, then rewrites indentation."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "빈 줄과 줄 끝 공백을 지우고 들여쓰기를 다시 씁니다."
+          }
+        }
+      }
+    },
+    "Install the extension to use this inside Xcode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install the extension to use this inside Xcode."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xcode 편집기에서 바로 쓰려면 Extension을 설치하세요."
+          }
+        }
+      }
+    },
+    "Guide": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guide"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "도움말"
+          }
+        }
+      }
+    },
+    "Copy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사"
+          }
+        }
+      }
+    },
+    "Copy %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 복사"
+          }
+        }
+      }
+    },
+    "Paste": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "붙여넣기"
+          }
+        }
+      }
+    },
+    "Clean": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clean"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정리"
+          }
+        }
+      }
+    },
+    "Spaces": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spaces"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스페이스"
+          }
+        }
+      }
+    },
+    "Tabs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tabs"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "탭"
+          }
+        }
+      }
+    },
+    "Chooses which character indentation is written with. Matches Xcode's Indent Using setting.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chooses which character indentation is written with. Matches Xcode's Indent Using setting."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정리된 결과의 들여쓰기를 어떤 문자로 쓸지 정합니다. Xcode의 Indent Using 설정에 해당합니다."
+          }
+        }
+      }
+    },
+    "How many columns one tab spans. Used to measure tabs in the pasted code, and to split the result when writing tabs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How many columns one tab spans. Used to measure tabs in the pasted code, and to split the result when writing tabs."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "탭 문자 하나가 몇 칸인지. 붙여넣은 코드에 섞인 탭의 깊이를 재고, 결과를 탭으로 쓸 때도 이 값으로 쪼갭니다."
+          }
+        }
+      }
+    },
+    "How many columns one indentation level uses. Code pasted at 4 becomes 2 when this is 2.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How many columns one indentation level uses. Code pasted at 4 becomes 2 when this is 2."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "들여쓰기 한 단계를 몇 칸으로 쓸지. 4칸으로 붙여넣은 코드를 2로 정리하면 2칸이 됩니다."
+          }
+        }
+      }
+    },
+    "Paste the code you want to clean.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste the code you want to clean."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정리할 코드를 붙여넣으세요."
+          }
+        }
+      }
+    },
+    "%lld lines → %lld lines, %lld blank removed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld lines → %lld lines, %lld blank removed"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld줄 → %lld줄 (빈 줄 %lld개 제거)"
+          }
+        }
+      }
+    },
+    "Nothing to clean.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to clean."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정리할 것이 없습니다."
+          }
+        }
+      }
+    },
+    "The clipboard has no text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The clipboard has no text."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "클립보드에 텍스트가 없습니다."
+          }
+        }
+      }
+    },
+    "Copied %@ to the clipboard.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied %@ to the clipboard."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@을 클립보드에 복사했습니다."
+          }
+        }
+      }
+    },
+    "The cleaned code appears here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The cleaned code appears here."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정리된 코드가 여기에 표시됩니다."
+          }
+        }
+      }
+    },
+    "How to use PasteClean": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How to use PasteClean"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PasteClean 사용법"
+          }
+        }
+      }
+    },
+    "Install and use the Xcode extension": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install and use the Xcode extension"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xcode Extension 설치 및 사용"
+          }
+        }
+      }
+    },
+    "Enable the extension": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable the extension"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extension 활성화"
+          }
+        }
+      }
+    },
+    "Assign a shortcut": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assign a shortcut"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "단축키 지정"
+          }
+        }
+      }
+    },
+    "Use it in Xcode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use it in Xcode"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xcode에서 사용"
+          }
+        }
+      }
+    },
+    "Close": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "닫기"
+          }
+        }
+      }
+    },
+    "Copying from a rendered Markdown code block leaves a blank line between every line, trailing whitespace at the ends, and indentation that does not match your project. This fixes all of it at once.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copying from a rendered Markdown code block leaves a blank line between every line, trailing whitespace at the ends, and indentation that does not match your project. This fixes all of it at once."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown으로 렌더링된 코드 블록에서 복사하면 줄마다 빈 줄이 끼어들고, 줄 끝에 공백이 남고, 들여쓰기 폭이 프로젝트와 어긋납니다. 한 번에 정리합니다."
+          }
+        }
+      }
+    },
+    "Paste into Input on the left. ⌘V goes there no matter what has focus.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste into Input on the left. ⌘V goes there no matter what has focus."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "왼쪽 Input에 붙여넣습니다. ⌘V를 누르면 어디에 포커스가 있든 Input으로 들어갑니다."
+          }
+        }
+      }
+    },
+    "Press ⌥O, or the Clean button, and the result appears in Output on the right.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press ⌥O, or the Clean button, and the result appears in Output on the right."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌥O를 누르거나 정리 버튼을 누르면 오른쪽 Output에 결과가 나옵니다."
+          }
+        }
+      }
+    },
+    "Take the result with the Copy button in the Output header.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take the result with the Copy button in the Output header."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output 헤더의 복사 버튼으로 결과를 가져갑니다."
+          }
+        }
+      }
+    },
+    "Hover any indentation control for an explanation of what it does.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hover any indentation control for an explanation of what it does."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "들여쓰기 설정은 각 컨트롤에 마우스를 올리면 설명이 나옵니다."
+          }
+        }
+      }
+    },
+    "Open System Settings ▸ General ▸ Login Items & Extensions.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open System Settings ▸ General ▸ Login Items & Extensions."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 설정 ▸ 일반 ▸ 로그인 항목 및 확장 프로그램을 엽니다."
+          }
+        }
+      }
+    },
+    "Select Xcode Source Editor.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select Xcode Source Editor."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xcode 소스 편집기(Xcode Source Editor)를 선택합니다."
+          }
+        }
+      }
+    },
+    "Turn PasteClean on.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn PasteClean on."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PasteClean를 켭니다."
+          }
+        }
+      }
+    },
+    "Restart Xcode if it was already running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restart Xcode if it was already running."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xcode가 실행 중이었다면 다시 시작합니다."
+          }
+        }
+      }
+    },
+    "Open Extension Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Extension Settings"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확장 프로그램 설정 열기"
+          }
+        }
+      }
+    },
+    "Open Xcode ▸ Settings ▸ Shortcuts.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Xcode ▸ Settings ▸ Shortcuts."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xcode ▸ Settings ▸ Shortcuts를 엽니다."
+          }
+        }
+      }
+    },
+    "Search for Clean Pasted Code.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search for Clean Pasted Code."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clean Pasted Code를 검색합니다."
+          }
+        }
+      }
+    },
+    "Type a shortcut. ⌥O is recommended.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type a shortcut. ⌥O is recommended."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "단축키를 입력합니다. (권장: ⌥O)"
+          }
+        }
+      }
+    },
+    "Select the code you want to clean.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select the code you want to clean."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정리할 코드를 선택합니다."
+          }
+        }
+      }
+    },
+    "Run Editor ▸ PasteClean ▸ Clean Pasted Code, or press ⌥O.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Run Editor ▸ PasteClean ▸ Clean Pasted Code, or press ⌥O."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editor ▸ PasteClean ▸ Clean Pasted Code를 실행하거나 ⌥O를 누릅니다."
+          }
+        }
+      }
+    },
+    "With nothing selected it cleans the whole file. ⌘Z undoes it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "With nothing selected it cleans the whole file. ⌘Z undoes it."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택 없이 실행하면 파일 전체를 정리합니다. ⌘Z로 되돌릴 수 있습니다."
+          }
+        }
+      }
+    },
+    "Indentation follows Xcode's own settings, so there is nothing to configure.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indentation follows Xcode's own settings, so there is nothing to configure."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "들여쓰기는 Xcode의 설정을 그대로 따르므로 따로 지정할 필요가 없습니다."
+          }
+        }
+      }
+    },
+    "Back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이전"
+          }
+        }
+      }
+    },
+    "Done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "닫기"
+          }
+        }
+      }
+    },
+    "Next": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다음"
+          }
+        }
+      }
+    },
+    "Show Line Numbers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Line Numbers"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "라인 넘버 보기"
+          }
+        }
+      }
+    }
+  }
+}
