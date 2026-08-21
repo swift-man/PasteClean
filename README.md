@@ -20,15 +20,24 @@ involved — it runs as an Editor menu command.
 Select the code and run **Editor ▸ PasteClean ▸ Clean Pasted Code**. Assign a
 shortcut in Xcode ▸ Settings ▸ Shortcuts — `⌥O` is recommended.
 
-With nothing selected it cleans the whole file, and `⌘Z` undoes it.
+With nothing selected it cleans the whole file, and `⌘Z` undoes it. Multiple
+selections are cleaned independently and remain selected.
 
 The app works on its own too: paste on the left, take the cleaned result from
-the right. Handy when the code isn't headed for Xcode.
+the right. Handy when the code isn't headed for Xcode. The output controls let
+you choose spaces or tabs and set the tab and indentation widths; toggle line
+numbers with `⇧⌘L`.
 
 ## Build
 
 ```bash
 xcodebuild -project PasteClean.xcodeproj -scheme PasteClean -configuration Release build
+```
+
+Run the unit tests with:
+
+```bash
+xcodebuild -project PasteClean.xcodeproj -scheme PasteCleanTests -destination 'platform=macOS' test
 ```
 
 Localized in English and Korean.
