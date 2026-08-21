@@ -92,7 +92,7 @@ struct ContentView: View {
         .help("Copy \(title)")
       }
       .padding(.horizontal, 10)
-      .padding(.vertical, 6)
+      .frame(height: Self.headerHeight)
       Divider()
       ZStack(alignment: .topLeading) {
         if text.wrappedValue.isEmpty {
@@ -133,6 +133,10 @@ struct ContentView: View {
   }
 
   /// Which character the cleaner writes indentation with.
+  ///
+  /// Only the app needs this control: inside Xcode the extension reads the
+  /// editor's own setting, so the help text explains the choice on its own
+  /// terms rather than naming a preference the reader may never have seen.
   private var indentCharacterPicker: some View {
     Picker("", selection: $usesTabs) {
       Text("Spaces").tag(false)
@@ -141,7 +145,7 @@ struct ContentView: View {
     .pickerStyle(.segmented)
     .frame(width: 130)
     .labelsHidden()
-    .help("Chooses which character indentation is written with. Matches Xcode's Indent Using setting.")
+    .help("Whether the cleaned code is indented with spaces or with tab characters. Match whatever the file you are pasting into already uses — mixing the two is what makes indentation look ragged.")
   }
 
   /// Laid out like Xcode's own indentation widths control.
@@ -152,7 +156,7 @@ struct ContentView: View {
       widthField(
         String(localized: "Tab"),
         value: $tabWidth,
-        help: String(localized: "How many columns one tab spans. Used to measure tabs in the pasted code, and to split the result when writing tabs.")
+        help: String(localized: "How many columns one tab counts as — a tab has no width of its own, so this decides it. Match the editor the code came from; with Tabs selected above, the result is written with tabs this wide too.")
       )
       widthField(
         String(localized: "Indent"),
@@ -255,4 +259,10 @@ struct ContentView: View {
 
   /// Matches `LineNumberRulerView.ruleThickness`.
   private static let gutterWidth: CGFloat = 38
+
+  /// Every pane header stands this tall whatever controls it carries, so the
+  /// rule beneath it — and with it the top of both editors — lines up across
+  /// the split. Sized for the tallest control any header holds: Output's
+  /// segmented picker, which is 24pt, plus 6pt of air above and below.
+  private static let headerHeight: CGFloat = 36
 }

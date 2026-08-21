@@ -228,36 +228,36 @@
         }
       }
     },
-    "Chooses which character indentation is written with. Matches Xcode's Indent Using setting.": {
+    "Whether the cleaned code is indented with spaces or with tab characters. Match whatever the file you are pasting into already uses — mixing the two is what makes indentation look ragged.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chooses which character indentation is written with. Matches Xcode's Indent Using setting."
+            "value": "Whether the cleaned code is indented with spaces or with tab characters. Match whatever the file you are pasting into already uses — mixing the two is what makes indentation look ragged."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "정리된 결과의 들여쓰기를 어떤 문자로 쓸지 정합니다. Xcode의 Indent Using 설정에 해당합니다."
+            "value": "정리된 코드의 들여쓰기를 공백 또는 탭 문자 중 무엇으로 쓸지 정합니다. 붙여넣을 파일에서 이미 사용하는 방식에 맞추세요. 두 방식을 섞으면 들여쓰기가 고르지 않게 보입니다."
           }
         }
       }
     },
-    "How many columns one tab spans. Used to measure tabs in the pasted code, and to split the result when writing tabs.": {
+    "How many columns one tab counts as — a tab has no width of its own, so this decides it. Match the editor the code came from; with Tabs selected above, the result is written with tabs this wide too.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How many columns one tab spans. Used to measure tabs in the pasted code, and to split the result when writing tabs."
+            "value": "How many columns one tab counts as — a tab has no width of its own, so this decides it. Match the editor the code came from; with Tabs selected above, the result is written with tabs this wide too."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "탭 문자 하나가 몇 칸인지. 붙여넣은 코드에 섞인 탭의 깊이를 재고, 결과를 탭으로 쓸 때도 이 값으로 쪼갭니다."
+            "value": "탭 하나를 몇 칸으로 계산할지 정합니다. 탭 자체에는 고정된 너비가 없으므로 원본 코드를 작성한 편집기에 맞추세요. 위에서 탭을 선택하면 결과도 이 너비의 탭으로 작성됩니다."
           }
         }
       }
