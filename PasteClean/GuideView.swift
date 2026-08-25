@@ -25,7 +25,11 @@ enum GuideTopic: String, Identifiable {
 
   var stepTitles: [String] {
     switch self {
-    case .app: [String(localized: "Guide"), String(localized: "Guide")]
+    case .app: [
+      String(localized: "What it fixes"),
+      String(localized: "Using the app"),
+      String(localized: "Use it inside Xcode")
+    ]
     case .xcodeExtension: [
       String(localized: "Enable the extension"),
       String(localized: "Assign a shortcut"),
@@ -50,30 +54,46 @@ enum GuideTopic: String, Identifiable {
 /// window instead, so it is visible without opening this.
 struct GuideView: View {
   let topic: GuideTopic
-  let dismiss: () -> Void
+  /// Opens another guide, or closes the sheet when passed `nil`. The last app
+  /// step hands off to the extension guide, so closing is not enough.
+  let open: (GuideTopic?) -> Void
 
   @State private var step = 0
   /// Which way the next transition should slide.
   @State private var isAdvancing = true
   private var lastStep: Int { topic.stepTitles.count - 1 }
 
+  private func dismiss() { open(nil) }
+
   var body: some View {
     VStack(spacing: 0) {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 24) {
-          header
-          content
+      VStack(alignment: .leading, spacing: 24) {
+        header
+        ZStack(alignment: .topLeading) {
+          // Every step, laid out but never drawn, so the sheet stands as tall
+          // as the tallest one and keeps that size while the reader moves
+          // through them. Measuring beats hardcoding a height that silently
+          // stops matching the moment a step gains a line.
+          ForEach(0...lastStep, id: \.self) { index in
+            content(index)
+              .hidden()
+              .accessibilityHidden(true)
+          }
+          content(step)
             .id(step)
             .transition(slide)
         }
-        .padding(32)
-        .frame(maxWidth: .infinity, alignment: .leading)
       }
+      .padding(32)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      // The slide transition parks the outgoing step beside the incoming one.
       .clipped()
       Divider()
       footer
     }
-    .frame(width: 820, height: 620)
+    // Width is fixed so the text measure stays put; height follows whichever
+    // step is showing, which is why the steps are kept short enough to fit.
+    .frame(width: 820)
   }
 
   private var header: some View {
@@ -93,9 +113,9 @@ struct GuideView: View {
       Spacer()
       Button(action: dismiss) {
         Image(systemName: "xmark")
-          .font(.system(size: 11, weight: .bold))
+          .font(.system(size: 14, weight: .bold))
           .foregroundStyle(.secondary)
-          .frame(width: 26, height: 26)
+          .frame(width: 34, height: 34)
           .background(.quaternary, in: .circle)
           .contentShape(.circle)
       }
@@ -105,10 +125,11 @@ struct GuideView: View {
     }
   }
 
-  @ViewBuilder private var content: some View {
+  @ViewBuilder private func content(_ step: Int) -> some View {
     switch (topic, step) {
     case (.app, 0): preview
-    case (.app, _): appUseStep
+    case (.app, 1): appUseStep
+    case (.app, _): appExtensionStep
     case (.xcodeExtension, 0): enableStep
     case (.xcodeExtension, 1): shortcutStep
     default: extensionUseStep
@@ -119,22 +140,45 @@ struct GuideView: View {
 
   private var preview: some View {
     VStack(alignment: .leading, spacing: 16) {
-      Text("Copying from a rendered Markdown code block leaves a blank line between every line, trailing whitespace at the ends, and indentation that does not match your project. This fixes all of it at once.")
-        .fixedSize(horizontal: false, vertical: true)
       HStack(alignment: .top, spacing: 12) {
         CodeBlock(title: "Before", code: Self.before)
         CodeBlock(title: "After", code: Self.after)
       }
+      Text("Copying from a rendered Markdown code block leaves a blank line between every line, trailing whitespace at the ends, and indentation that does not match your project. This fixes all of it at once.")
+        .fixedSize(horizontal: false, vertical: true)
     }
   }
 
   private var appUseStep: some View {
-    Steps(items: [
-      "Paste into Input on the left. ⌘V goes there no matter what has focus.",
-      "Press ⌥O, or the Clean button, and the result appears in Output on the right.",
-      "Take the result with the Copy button in the Output header.",
-      "Hover any indentation control for an explanation of what it does."
-    ])
+    VStack(alignment: .leading, spacing: 16) {
+      WindowSketch(before: Self.before, after: Self.after)
+      Steps(items: [
+        "Paste into Input on the left. ⌘V goes there no matter what has focus.",
+        "Press ⌥O, or the Clean button, and the result appears in Output on the right.",
+        "Take the result with the Copy button in the Output header.",
+        "Hover any indentation control for an explanation of what it does."
+      ])
+    }
+  }
+
+  /// The app is the fallback, not the main event: anyone already in Xcode can
+  /// skip the copying entirely, so the last step points them at the extension.
+  private var appExtensionStep: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      Text("Writing Swift in Xcode? Then you never have to come here. The same cleaner installs as a source editor extension and runs on the file you already have open.")
+        .fixedSize(horizontal: false, vertical: true)
+      MenuPath(items: ["Editor", "PasteClean", "Clean Pasted Code"])
+      Steps(items: [
+        "Select the code you pasted, or nothing at all to clean the whole file.",
+        "Run that menu item, or the keyboard shortcut you give it.",
+        "Indentation follows Xcode's own settings, so none of the controls here apply."
+      ]) {
+        Button("Set Up the Extension", systemImage: "puzzlepiece.extension") {
+          open(.xcodeExtension)
+        }
+        .controlSize(.large)
+      }
+    }
   }
 
   private var enableStep: some View {
@@ -154,20 +198,26 @@ struct GuideView: View {
   }
 
   private var shortcutStep: some View {
-    Steps(items: [
-      "Open Xcode ▸ Settings ▸ Shortcuts.",
-      "Search for Clean Pasted Code.",
-      "Type a shortcut. ⌥O is recommended."
-    ])
+    VStack(alignment: .leading, spacing: 16) {
+      MenuPath(items: ["Xcode", "Settings", "Shortcuts"])
+      Steps(items: [
+        "Open that pane.",
+        "Search for Clean Pasted Code.",
+        "Type a shortcut. ⌥O is recommended."
+      ])
+    }
   }
 
   private var extensionUseStep: some View {
-    Steps(items: [
-      "Select the code you want to clean.",
-      "Run Editor ▸ PasteClean ▸ Clean Pasted Code, or press ⌥O.",
-      "With nothing selected it cleans the whole file. ⌘Z undoes it.",
-      "Indentation follows Xcode's own settings, so there is nothing to configure."
-    ])
+    VStack(alignment: .leading, spacing: 16) {
+      MenuPath(items: ["Editor", "PasteClean", "Clean Pasted Code"])
+      Steps(items: [
+        "Select the code you want to clean.",
+        "Run that menu item, or the keyboard shortcut you give it.",
+        "With nothing selected it cleans the whole file. ⌘Z undoes it.",
+        "Indentation follows Xcode's own settings, so there is nothing to configure."
+      ])
+    }
   }
 
   // MARK: - Chrome
@@ -212,7 +262,7 @@ struct GuideView: View {
   private static let before = """
     make.left.right.equalToSuperview().inset(22)
 
-    // 1000 : 313 비율
+    // width: 1000 : height 313
 
     make.height.equalTo(bannerView.snp.width)
 
@@ -223,7 +273,7 @@ struct GuideView: View {
 
   private static let after = """
     make.left.right.equalToSuperview().inset(22)
-    // 1000 : 313 비율
+    // width: 1000 : height 313
     make.height.equalTo(bannerView.snp.width)
       .multipliedBy(313.0 / 1000.0)
     make.bottom.equalToSuperview().offset(-20)
@@ -261,6 +311,118 @@ extension Steps where Accessory == EmptyView {
   }
 }
 
+/// A drawing of the main window — deliberately not a screenshot.
+///
+/// It is built from the same localized strings the window itself uses, so it
+/// reads correctly in every language the app is translated into and in both
+/// appearances. A captured bitmap would only ever match the language it was
+/// taken in, and would quietly go stale the next time the window changed.
+private struct WindowSketch: View {
+  let before: String
+  let after: String
+
+  var body: some View {
+    VStack(spacing: 0) {
+      HStack(spacing: 6) {
+        Image(systemName: "wand.and.sparkles")
+          .foregroundStyle(.tint)
+        Text("Paste ⌘V → Clean ⌥O → Copy from the right")
+          .fontWeight(.medium)
+        Spacer(minLength: 0)
+      }
+      .font(.caption)
+      .padding(.horizontal, 10)
+      .padding(.vertical, 7)
+      Divider()
+      HStack(spacing: 0) {
+        pane(title: "Input", code: before)
+        Divider()
+        pane(title: "Output", code: after)
+      }
+      Divider()
+      HStack(spacing: 6) {
+        Text(verbatim: "Widths")
+          .foregroundStyle(.secondary)
+        ForEach(["Tab", "Indent"], id: \.self) { caption in
+          Text(verbatim: "4  \(caption)")
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 4))
+        }
+        Spacer(minLength: 0)
+        button("Paste", "doc.on.clipboard", prominent: false)
+        button("Clean", "wand.and.sparkles", prominent: true)
+      }
+      .font(.caption)
+      .padding(.horizontal, 10)
+      .padding(.vertical, 7)
+    }
+    .background(.background.secondary)
+    .clipShape(.rect(cornerRadius: 8))
+    .overlay { RoundedRectangle(cornerRadius: 8).strokeBorder(.quaternary) }
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel("The PasteClean window, with Input on the left and Output on the right.")
+  }
+
+  private func pane(title: LocalizedStringKey, code: String) -> some View {
+    VStack(spacing: 0) {
+      HStack(spacing: 6) {
+        Text(title)
+          .fontWeight(.semibold)
+          .foregroundStyle(.secondary)
+        Spacer(minLength: 0)
+        Label("Copy", systemImage: "doc.on.doc")
+          .foregroundStyle(.secondary)
+      }
+      .font(.caption2)
+      .padding(.horizontal, 8)
+      .padding(.vertical, 6)
+      Divider()
+      Text(code)
+        .font(.system(size: 8, design: .monospaced))
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(8)
+    }
+    .frame(maxWidth: .infinity)
+  }
+
+  private func button(_ title: LocalizedStringKey, _ symbol: String, prominent: Bool) -> some View {
+    Label(title, systemImage: symbol)
+      .foregroundStyle(prominent ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+      .padding(.horizontal, 7)
+      .padding(.vertical, 3)
+      .background(
+        prominent ? AnyShapeStyle(.tint) : AnyShapeStyle(.quaternary.opacity(0.5)),
+        in: .rect(cornerRadius: 4)
+      )
+  }
+}
+
+/// A menu path, drawn the way the menu bar reads it.
+///
+/// Plain `String`s: these are the names Xcode's own menu shows, which stay in
+/// English whatever language PasteClean is running in.
+private struct MenuPath: View {
+  let items: [String]
+
+  var body: some View {
+    HStack(spacing: 8) {
+      ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+        if index > 0 {
+          Image(systemName: "chevron.right")
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(.tertiary)
+        }
+        Text(item)
+          .font(.callout.weight(index == items.count - 1 ? .semibold : .regular))
+      }
+    }
+    .padding(.horizontal, 12)
+    .padding(.vertical, 8)
+    .background(.quaternary.opacity(0.4), in: .rect(cornerRadius: 8))
+  }
+}
+
 /// A labelled, monospaced, non-editable snippet.
 private struct CodeBlock: View {
   let title: LocalizedStringKey
@@ -282,5 +444,5 @@ private struct CodeBlock: View {
 }
 
 #Preview {
-  GuideView(topic: .app) {}
+  GuideView(topic: .app) { _ in }
 }
