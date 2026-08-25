@@ -71,7 +71,8 @@ struct CodeTextView: NSViewRepresentable {
 
   func makeCoordinator() -> Coordinator { Coordinator(text: $text) }
 
-  static let font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+  static let fontSize: CGFloat = 12
+  static let font = NSFont.monospacedSystemFont(ofSize: fontSize, weight: .regular)
 
   final class Coordinator: NSObject, NSTextViewDelegate {
     private let text: Binding<String>

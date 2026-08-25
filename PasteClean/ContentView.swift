@@ -102,7 +102,7 @@ struct ContentView: View {
           // Line up with where CodeTextView actually draws: the gutter, then the
           // text container inset (4) plus the line fragment padding (5).
           Text(placeholder)
-            .font(.system(size: 12, design: .monospaced))
+            .font(.system(size: CodeTextView.fontSize, design: .monospaced))
             .foregroundStyle(.tertiary)
             .padding(.leading, (showsLineNumbers ? Self.gutterWidth : 0) + 9)
             .padding(.top, 6)
@@ -175,9 +175,15 @@ struct ContentView: View {
   }
 
   private func widthField(_ caption: String, value: Binding<Int>, help: String) -> some View {
+    let supportedRange = IndentationStyle.supportedWidthRange
     let clampedValue = Binding(
       get: { value.wrappedValue },
-      set: { value.wrappedValue = min(max($0, 1), 16) }
+      set: {
+        value.wrappedValue = min(
+          max($0, supportedRange.lowerBound),
+          supportedRange.upperBound
+        )
+      }
     )
     return VStack(spacing: 0) {
       HStack(spacing: 0) {
@@ -185,7 +191,7 @@ struct ContentView: View {
           .textFieldStyle(.roundedBorder)
           .multilineTextAlignment(.trailing)
           .frame(width: 32)
-        Stepper("", value: clampedValue, in: IndentationStyle.supportedWidthRange)
+        Stepper("", value: clampedValue, in: supportedRange)
           .labelsHidden()
       }
       Text(caption)
