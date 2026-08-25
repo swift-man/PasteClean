@@ -16,9 +16,11 @@ import AppKit
 enum HelpMenu {
   private static let delegate = Delegate()
   private static var timer: Timer?
+  private static var trackingObserver: NSObjectProtocol?
 
   static func install() {
     attach()
+    observeMenuTracking()
     // The main menu is rebuilt as the app settles; keep re-attaching briefly.
     timer?.invalidate()
     var ticks = 0
@@ -28,6 +30,22 @@ enum HelpMenu {
         ticks += 1
         if ticks >= 20 { timer.invalidate() }
       }
+    }
+  }
+
+  /// SwiftUI throws the whole main menu away and builds a new one whenever its
+  /// commands change — toggling Show Line Numbers is enough — and the
+  /// replacement Help menu carries neither our items nor our delegate, so the
+  /// entries vanish for good. Re-attaching the moment any menu starts tracking
+  /// puts them back before the Help menu can be drawn.
+  private static func observeMenuTracking() {
+    guard trackingObserver == nil else { return }
+    trackingObserver = NotificationCenter.default.addObserver(
+      forName: NSMenu.didBeginTrackingNotification,
+      object: nil,
+      queue: .main
+    ) { _ in
+      MainActor.assumeIsolated { attach() }
     }
   }
 
@@ -69,9 +87,19 @@ enum HelpMenu {
         }
         menu.insertItem(.separator(), at: HelpMenu.entries.count)
       }
-      // AppKit leaves a separator above the system's own Help item.
+      normalizeSeparators(menu)
+    }
+
+    /// AppKit puts its own separator above the system's Help item, and on a
+    /// real click it does so after this has already run — which strands one at
+    /// the top of the menu and doubles the one in the middle.
+    private func normalizeSeparators(_ menu: NSMenu) {
       while menu.items.first?.isSeparatorItem == true {
         menu.removeItem(at: 0)
+      }
+      for index in stride(from: menu.items.count - 1, to: 0, by: -1)
+      where menu.items[index].isSeparatorItem && menu.items[index - 1].isSeparatorItem {
+        menu.removeItem(at: index)
       }
     }
 

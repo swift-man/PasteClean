@@ -36,7 +36,10 @@ struct ContentView: View {
     }
     .frame(minWidth: 980, minHeight: 480)
     .sheet(item: $guide.topic) { topic in
-      GuideView(topic: topic) { guide.topic = nil }
+      // Identity follows the topic so switching guides mid-sheet starts the
+      // new one at its first step instead of inheriting the old step number.
+      GuideView(topic: topic) { guide.topic = $0 }
+        .id(topic)
     }
   }
 
@@ -99,7 +102,7 @@ struct ContentView: View {
           // Line up with where CodeTextView actually draws: the gutter, then the
           // text container inset (4) plus the line fragment padding (5).
           Text(placeholder)
-            .font(.system(size: 12, design: .monospaced))
+            .font(.system(size: CodeTextView.fontSize, design: .monospaced))
             .foregroundStyle(.tertiary)
             .padding(.leading, (showsLineNumbers ? Self.gutterWidth : 0) + 9)
             .padding(.top, 6)
@@ -149,17 +152,22 @@ struct ContentView: View {
   }
 
   /// Laid out like Xcode's own indentation widths control.
+  ///
+  /// The three labels are deliberately not localized: they name the same
+  /// settings an editor shows in English, and translating them only makes the
+  /// two harder to line up.
   private var widths: some View {
-    HStack(spacing: 8) {
-      Text("Widths")
+    HStack(spacing: 5) {
+      Text(verbatim: "Widths")
+        .font(.caption)
         .foregroundStyle(.secondary)
       widthField(
-        String(localized: "Tab"),
+        "Tab",
         value: $tabWidth,
         help: String(localized: "How many columns one tab counts as. Match the editor the code came from. This value measures tabs in the pasted code and, when Tabs is selected above, determines how many tabs and spaces are used to write the result.")
       )
       widthField(
-        String(localized: "Indent"),
+        "Indent",
         value: $indentationWidth,
         help: String(localized: "How many columns one indentation level uses. Code pasted at 4 becomes 2 when this is 2.")
       )
@@ -167,23 +175,30 @@ struct ContentView: View {
   }
 
   private func widthField(_ caption: String, value: Binding<Int>, help: String) -> some View {
+    let supportedRange = IndentationStyle.supportedWidthRange
     let clampedValue = Binding(
       get: { value.wrappedValue },
-      set: { value.wrappedValue = min(max($0, 1), 16) }
+      set: {
+        value.wrappedValue = min(
+          max($0, supportedRange.lowerBound),
+          supportedRange.upperBound
+        )
+      }
     )
-    return VStack(spacing: 2) {
-      HStack(spacing: 2) {
+    return VStack(spacing: 0) {
+      HStack(spacing: 0) {
         TextField("", value: clampedValue, format: .number)
           .textFieldStyle(.roundedBorder)
           .multilineTextAlignment(.trailing)
-          .frame(width: 46)
-        Stepper("", value: clampedValue, in: IndentationStyle.supportedWidthRange)
+          .frame(width: 32)
+        Stepper("", value: clampedValue, in: supportedRange)
           .labelsHidden()
       }
       Text(caption)
-        .font(.caption)
+        .font(.caption2)
         .foregroundStyle(.secondary)
     }
+    .controlSize(.small)
     .help(help)
   }
 
@@ -204,17 +219,9 @@ struct ContentView: View {
       )
     )
     output = cleaned.joined(separator: "\n")
-    let removed = lines.count - cleaned.count
-    if removed > 0 {
-      let inputCount = Self.localizedLineCount(lines.count)
-      let outputCount = Self.localizedLineCount(cleaned.count)
-      let removedCount = Self.localizedBlankLineCount(removed)
-      status = String(localized: "\(inputCount) → \(outputCount), \(removedCount) removed")
-    } else if output != input {
-      status = String(localized: "Cleaned \(Self.localizedLineCount(cleaned.count)).")
-    } else {
-      status = String(localized: "Nothing to clean.")
-    }
+    // A clean that changed something speaks for itself in the Output pane; the
+    // line says something only when nothing happened.
+    status = output == input ? String(localized: "Nothing to clean.") : ""
   }
 
   /// ⌘V anywhere in the window drops the clipboard into the left pane and cleans it.
@@ -239,14 +246,6 @@ struct ContentView: View {
       .replacingOccurrences(of: "\r\n", with: "\n")
       .replacingOccurrences(of: "\r", with: "\n")
       .components(separatedBy: "\n")
-  }
-
-  private static func localizedLineCount(_ count: Int) -> String {
-    count == 1 ? String(localized: "1 line") : String(localized: "\(count) lines")
-  }
-
-  private static func localizedBlankLineCount(_ count: Int) -> String {
-    count == 1 ? String(localized: "1 blank line") : String(localized: "\(count) blank lines")
   }
 
   /// A paste out of a rendered Markdown code block: a blank line after every line.
