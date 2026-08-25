@@ -82,6 +82,13 @@ enum CodeCleaner {
   /// blank line before the text counts as "double spaced" by the assistant.
   private static let doubleSpacingThreshold = 0.6
 
+  /// Splits text on any Unicode newline while preserving empty and trailing lines.
+  static func splitLines(in string: String) -> [String] {
+    string
+      .split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
+      .map(String.init)
+  }
+
   /// Cleans `lines` (which must not contain line terminators).
   ///
   /// - Parameters:

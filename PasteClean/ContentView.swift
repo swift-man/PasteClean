@@ -209,7 +209,7 @@ struct ContentView: View {
       status = String(localized: "Paste the code you want to clean.")
       return
     }
-    let lines = Self.split(input)
+    let lines = CodeCleaner.splitLines(in: input)
     let cleaned = CodeCleaner.clean(
       lines: lines,
       style: IndentationStyle(
@@ -238,14 +238,6 @@ struct ContentView: View {
     NSPasteboard.general.clearContents()
     NSPasteboard.general.setString(string, forType: .string)
     status = String(localized: "Copied \(label) to the clipboard.")
-  }
-
-  /// Splits on any line ending, matching what the editor hands the extension.
-  private static func split(_ string: String) -> [String] {
-    string
-      .replacingOccurrences(of: "\r\n", with: "\n")
-      .replacingOccurrences(of: "\r", with: "\n")
-      .components(separatedBy: "\n")
   }
 
   /// A paste out of a rendered Markdown code block: a blank line after every line.

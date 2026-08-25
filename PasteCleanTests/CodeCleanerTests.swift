@@ -12,6 +12,33 @@ import Testing
 @Suite("CodeCleaner")
 struct CodeCleanerTests {
 
+  // MARK: - 줄바꿈
+
+  @Suite("줄바꿈")
+  struct LineEndings {
+
+    @Test("LF, CRLF, CR과 Unicode 줄바꿈을 한 번에 분리한다")
+    func splitsEverySupportedLineEnding() {
+      for lineEnding in ["\n", "\r\n", "\r", "\u{2028}"] {
+        #expect(CodeCleaner.splitLines(in: "first\(lineEnding)second") == ["first", "second"])
+      }
+    }
+
+    @Test("빈 문자열과 마지막 줄바꿈을 빈 줄로 보존한다")
+    func preservesEmptyAndTrailingLines() {
+      #expect(CodeCleaner.splitLines(in: "") == [""])
+      #expect(CodeCleaner.splitLines(in: "first\n") == ["first", ""])
+      #expect(CodeCleaner.splitLines(in: "first\n\n") == ["first", "", ""])
+    }
+
+    @Test("서로 다른 줄바꿈이 섞여도 줄 순서를 보존한다")
+    func preservesLinesWithMixedEndings() {
+      #expect(CodeCleaner.splitLines(in: "first\r\nsecond\rthird\nfourth") == [
+        "first", "second", "third", "fourth",
+      ])
+    }
+  }
+
   // MARK: - 빈 줄
 
   @Suite("빈 줄")
