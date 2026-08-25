@@ -28,6 +28,10 @@ the right. Handy when the code isn't headed for Xcode. The output controls let
 you choose spaces or tabs and set the tab and indentation widths; toggle line
 numbers with `⇧⌘L`.
 
+For a walkthrough, open **Help ▸ How to use PasteClean**. Its three-step guide
+shows what gets fixed, how to use the app, and then hands off directly to the
+Xcode extension setup guide.
+
 ## Build
 
 ```bash
