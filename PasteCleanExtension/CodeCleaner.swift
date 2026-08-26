@@ -89,6 +89,17 @@ enum CodeCleaner {
       .map(String.init)
   }
 
+  /// Cleans complete text while retaining the input's newline convention.
+  ///
+  /// The app receives one string rather than Xcode's array of terminated
+  /// lines. Reusing the first encountered separator keeps LF, CRLF, CR and
+  /// Unicode newline input from being silently rewritten as LF.
+  static func clean(text: String, style: IndentationStyle) -> String {
+    let newline = text.first(where: \.isNewline).map(String.init) ?? "\n"
+    return clean(lines: splitLines(in: text), style: style)
+      .joined(separator: newline)
+  }
+
   /// Cleans `lines` (which must not contain line terminators).
   ///
   /// - Parameters:

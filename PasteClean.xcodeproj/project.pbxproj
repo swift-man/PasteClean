@@ -21,6 +21,9 @@
 		AA0700000000000000000001 /* CleanPastedCodePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0700000000000000000004 /* CleanPastedCodePlanner.swift */; };
 		AA0700000000000000000002 /* CleanPastedCodePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0700000000000000000004 /* CleanPastedCodePlanner.swift */; };
 		AA0700000000000000000003 /* CleanPastedCodePlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0700000000000000000005 /* CleanPastedCodePlannerTests.swift */; };
+		AA0800000000000000000001 /* GuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0300000000000000000002 /* GuideView.swift */; };
+		AA0800000000000000000002 /* HelpMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0500000000000000000002 /* HelpMenu.swift */; };
+		AA0800000000000000000003 /* GuideAndHelpMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0800000000000000000004 /* GuideAndHelpMenuTests.swift */; };
 		AA0200000000000000000001 /* CodeCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */; };
 		0F1A8A5907F8429FD27AE19F /* XcodeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10E6DA89C1E917289EB1C39C /* XcodeKit.framework */; };
 		30A1B4C7E2D5F08931746A2B /* CodeCleanerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E5A97B1C4D60F83A2B7E15 /* CodeCleanerTests.swift */; };
@@ -65,6 +68,7 @@
 		0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeCleaner.swift; sourceTree = "<group>"; };
 		AA0700000000000000000004 /* CleanPastedCodePlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPastedCodePlanner.swift; sourceTree = "<group>"; };
 		AA0700000000000000000005 /* CleanPastedCodePlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPastedCodePlannerTests.swift; sourceTree = "<group>"; };
+		AA0800000000000000000004 /* GuideAndHelpMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideAndHelpMenuTests.swift; sourceTree = "<group>"; };
 		10E6DA89C1E917289EB1C39C /* XcodeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XcodeKit.framework; path = Library/Frameworks/XcodeKit.framework; sourceTree = DEVELOPER_DIR; };
 		158F69C61A45E28A99C09C28 /* PasteClean.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PasteClean.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F98C1F8A090D5206875B73 /* PasteClean.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PasteClean.entitlements; sourceTree = "<group>"; };
@@ -164,6 +168,7 @@
 			children = (
 				32E5A97B1C4D60F83A2B7E15 /* CodeCleanerTests.swift */,
 				AA0700000000000000000005 /* CleanPastedCodePlannerTests.swift */,
+				AA0800000000000000000004 /* GuideAndHelpMenuTests.swift */,
 			);
 			path = PasteCleanTests;
 			sourceTree = "<group>";
@@ -325,6 +330,9 @@
 				31C8D0F3A6B94E27051D8C3A /* CodeCleaner.swift in Sources */,
 				AA0700000000000000000002 /* CleanPastedCodePlanner.swift in Sources */,
 				AA0700000000000000000003 /* CleanPastedCodePlannerTests.swift in Sources */,
+				AA0800000000000000000001 /* GuideView.swift in Sources */,
+				AA0800000000000000000002 /* HelpMenu.swift in Sources */,
+				AA0800000000000000000003 /* GuideAndHelpMenuTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

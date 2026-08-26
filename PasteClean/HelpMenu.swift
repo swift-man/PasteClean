@@ -7,7 +7,7 @@
 
 import AppKit
 
-/// Puts the two guides in the Help menu.
+/// Connects the standard app Help item to the app guide and adds the extension guide.
 ///
 /// SwiftUI ignores the `.help` command placement here and rebuilds the main menu
 /// often enough that items inserted once are dropped again, so this attaches a
@@ -15,20 +15,18 @@ import AppKit
 @MainActor
 enum HelpMenu {
   private static let delegate = Delegate()
-  private static var timer: Timer?
+  private static var installTask: Task<Void, Never>?
   private static var trackingObserver: NSObjectProtocol?
 
   static func install() {
-    attach()
     observeMenuTracking()
     // The main menu is rebuilt as the app settles; keep re-attaching briefly.
-    timer?.invalidate()
-    var ticks = 0
-    timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
-      MainActor.assumeIsolated {
+    installTask?.cancel()
+    installTask = Task { @MainActor in
+      for _ in 0..<20 {
+        guard !Task.isCancelled else { return }
         attach()
-        ticks += 1
-        if ticks >= 20 { timer.invalidate() }
+        try? await Task.sleep(nanoseconds: 500_000_000)
       }
     }
   }
@@ -50,44 +48,130 @@ enum HelpMenu {
   }
 
   private static func attach() {
-    guard let menu = helpMenu else { return }
+    attach(to: helpMenu)
+  }
+
+  /// Accepts a menu explicitly so the AppKit boundary can be verified without
+  /// depending on the test runner's process-wide main menu.
+  static func attach(to menu: NSMenu?) {
+    guard let menu else { return }
     if menu.delegate !== delegate { menu.delegate = delegate }
     delegate.fill(menu)
   }
 
   private static var helpMenu: NSMenu? {
-    if let menu = NSApp.helpMenu { return menu }
-
-    let submenus = NSApp.mainMenu?.items.compactMap(\.submenu) ?? []
-    let menu = submenus.first { submenu in
-      submenu.items.contains { $0.action == #selector(NSApplication.showHelp(_:)) }
-    }
+    let menu = resolveHelpMenu(
+      in: NSApp.mainMenu,
+      registeredHelpMenu: NSApp.helpMenu
+    )
     if let menu { NSApp.helpMenu = menu }
     return menu
   }
 
-  fileprivate static let entries: [(title: String, topic: GuideTopic)] = [
-    (String(localized: "How to use PasteClean"), .app),
-    (String(localized: "Install and use the Xcode extension"), .xcodeExtension)
-  ]
+  /// Resolves the transient menu shapes SwiftUI creates while rebuilding the
+  /// menu bar. During that window the last submenu is the Help menu even
+  /// before AppKit has attached its standard Help item or identifier.
+  static func resolveHelpMenu(
+    in mainMenu: NSMenu?,
+    registeredHelpMenu: NSMenu?
+  ) -> NSMenu? {
+    let submenus = mainMenu?.items.compactMap(\.submenu) ?? []
+    return submenus.first { submenu in
+      submenu.items.contains {
+        $0.action == #selector(NSApplication.showHelp(_:))
+          || $0.identifier == appHelpIdentifier
+          || $0.identifier == extensionEntryIdentifier
+      }
+    } ?? submenus.last ?? registeredHelpMenu
+  }
+
+  static let extensionEntry = (
+    title: String(localized: "Install and use the Xcode extension"),
+    topic: GuideTopic.xcodeExtension
+  )
+  static let appHelpTitle = String(localized: "PasteClean Help")
+  static let extensionEntryIdentifier = NSUserInterfaceItemIdentifier(
+    "PasteClean.ExtensionGuide"
+  )
+  static let appHelpIdentifier = NSUserInterfaceItemIdentifier(
+    "PasteClean.AppHelp"
+  )
 
   @MainActor
-  private final class Delegate: NSObject, NSMenuDelegate {
+  final class Delegate: NSObject, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) { fill(menu) }
 
     func menuWillOpen(_ menu: NSMenu) { fill(menu) }
 
     func fill(_ menu: NSMenu) {
-      if !menu.items.contains(where: { $0.title == HelpMenu.entries[0].title }) {
-        for (index, entry) in HelpMenu.entries.enumerated() {
-          let item = NSMenuItem(title: entry.title, action: #selector(open(_:)), keyEquivalent: "")
-          item.target = self
-          item.representedObject = entry.topic.rawValue
-          menu.insertItem(item, at: index)
-        }
-        menu.insertItem(.separator(), at: HelpMenu.entries.count)
-      }
+      removeLegacyAppGuideItem(from: menu)
+      redirectStandardHelpItem(in: menu)
+      insertExtensionGuideIfNeeded(in: menu)
       normalizeSeparators(menu)
+    }
+
+    /// The system-provided “PasteClean Help” item keeps its native title and
+    /// placement, but opens the in-app usage guide instead of a help book.
+    private func redirectStandardHelpItem(in menu: NSMenu) {
+      let item: NSMenuItem
+      if let existing = menu.items.first(where: {
+        $0.identifier == HelpMenu.appHelpIdentifier
+          || $0.action == #selector(NSApplication.showHelp(_:))
+      }) {
+        item = existing
+      } else {
+        item = NSMenuItem(
+          title: HelpMenu.appHelpTitle,
+          action: #selector(open(_:)),
+          keyEquivalent: ""
+        )
+        menu.addItem(item)
+      }
+
+      item.identifier = HelpMenu.appHelpIdentifier
+      item.target = self
+      item.action = #selector(open(_:))
+      item.representedObject = GuideTopic.app.rawValue
+
+      // AppKit can append its original help-book item after the delegate has
+      // filled the menu. The next attachment pass removes that duplicate.
+      for duplicate in menu.items where duplicate !== item
+        && duplicate.action == #selector(NSApplication.showHelp(_:)) {
+        menu.removeItem(duplicate)
+      }
+    }
+
+    private func insertExtensionGuideIfNeeded(in menu: NSMenu) {
+      let item: NSMenuItem
+      if let existing = menu.items.first(where: {
+        $0.identifier == HelpMenu.extensionEntryIdentifier
+      }) {
+        item = existing
+      } else {
+        item = NSMenuItem(
+          title: HelpMenu.extensionEntry.title,
+          action: #selector(open(_:)),
+          keyEquivalent: ""
+        )
+        item.identifier = HelpMenu.extensionEntryIdentifier
+        item.target = self
+        item.representedObject = HelpMenu.extensionEntry.topic.rawValue
+        menu.insertItem(item, at: 0)
+      }
+
+      guard let index = menu.items.firstIndex(of: item), index + 1 < menu.items.count,
+            !menu.items[index + 1].isSeparatorItem
+      else { return }
+      menu.insertItem(.separator(), at: index + 1)
+    }
+
+    /// Removes the old duplicate item when the menu survives an in-place app
+    /// update. The native app Help item now owns the app-guide action.
+    private func removeLegacyAppGuideItem(from menu: NSMenu) {
+      let legacyTitle = String(localized: "How to use PasteClean")
+      for item in menu.items where item.title == legacyTitle {
+        menu.removeItem(item)
+      }
     }
 
     /// AppKit puts its own separator above the system's Help item, and on a
@@ -103,7 +187,7 @@ enum HelpMenu {
       }
     }
 
-    @objc private func open(_ sender: NSMenuItem) {
+    @objc func open(_ sender: NSMenuItem) {
       guard let raw = sender.representedObject as? String,
             let topic = GuideTopic(rawValue: raw)
       else { return }

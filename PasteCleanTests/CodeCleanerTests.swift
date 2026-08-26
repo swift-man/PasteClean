@@ -37,6 +37,18 @@ struct CodeCleanerTests {
         "first", "second", "third", "fourth",
       ])
     }
+
+    @Test(
+      "전체 텍스트를 정리해도 입력 줄바꿈 방식을 보존한다",
+      arguments: ["\n", "\r\n", "\r", "\u{2028}"]
+    )
+    func cleansTextPreservingLineEnding(_ lineEnding: String) {
+      let input = "let a = 1  \(lineEnding)let b = 2  \(lineEnding)"
+
+      let result = CodeCleaner.clean(text: input, style: .default)
+
+      #expect(result == "let a = 1\(lineEnding)let b = 2\(lineEnding)")
+    }
   }
 
   // MARK: - 빈 줄
