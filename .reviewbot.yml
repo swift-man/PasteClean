@@ -54,6 +54,7 @@ review:
     - "**/*+Generated.swift"
 
     # Asset catalogs and binary resources
+    - "Resources/**"
     - "**/*.png"
     - "**/*.jpg"
     - "**/*.jpeg"
