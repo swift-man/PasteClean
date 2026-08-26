@@ -59,6 +59,49 @@ struct ProjectConfigurationTests {
     #expect(buildNumber >= 3)
   }
 
+  @Test("The shared app scheme archives the host app")
+  func sharedAppSchemeArchivesHostApp() throws {
+    let schemeDocument = try XMLDocument(
+      contentsOf: sharedAppSchemeFileURL,
+      options: []
+    )
+
+    let archiveBuildEntries = try schemeDocument.nodes(
+      forXPath: "//BuildActionEntry[@buildForArchiving='YES']/BuildableReference"
+    )
+    let archivedProducts = archiveBuildEntries.compactMap(buildableIdentity)
+    #expect(archivedProducts == [appBuildableIdentity])
+
+    let archiveActions = try schemeDocument.nodes(
+      forXPath: "/Scheme/ArchiveAction[@buildConfiguration='Release']"
+    )
+    #expect(archiveActions.count == 1)
+
+    let runnableReferences = try schemeDocument.nodes(
+      forXPath: "//BuildableProductRunnable/BuildableReference"
+    )
+    #expect(
+      runnableReferences.compactMap(buildableIdentity)
+        == [appBuildableIdentity, appBuildableIdentity]
+    )
+  }
+
+  @Test("The shared test scheme keeps the test target available")
+  func sharedTestSchemeKeepsTestTargetAvailable() throws {
+    let schemeDocument = try XMLDocument(
+      contentsOf: sharedTestSchemeFileURL,
+      options: []
+    )
+    let testableReferences = try schemeDocument.nodes(
+      forXPath: "//TestableReference/BuildableReference"
+    )
+
+    #expect(
+      testableReferences.compactMap(buildableIdentity)
+        == [testBuildableIdentity]
+    )
+  }
+
   private var projectFileURL: URL {
     repositoryRootURL
       .appendingPathComponent("PasteClean.xcodeproj/project.pbxproj")
@@ -69,9 +112,58 @@ struct ProjectConfigurationTests {
       .appendingPathComponent("PasteCleanExtension/PasteCleanExtension.entitlements")
   }
 
+  private var sharedAppSchemeFileURL: URL {
+    sharedSchemesDirectoryURL.appendingPathComponent("PasteClean.xcscheme")
+  }
+
+  private var sharedTestSchemeFileURL: URL {
+    sharedSchemesDirectoryURL.appendingPathComponent("PasteCleanTests.xcscheme")
+  }
+
+  private var sharedSchemesDirectoryURL: URL {
+    repositoryRootURL
+      .appendingPathComponent("PasteClean.xcodeproj/xcshareddata/xcschemes")
+  }
+
+  private var appBuildableIdentity: BuildableIdentity {
+    BuildableIdentity(
+      blueprintIdentifier: "214463214C206F029C3B6CF9",
+      buildableName: "PasteClean.app",
+      blueprintName: "PasteClean"
+    )
+  }
+
+  private var testBuildableIdentity: BuildableIdentity {
+    BuildableIdentity(
+      blueprintIdentifier: "35F2C81D4A0E76B93C5D2081",
+      buildableName: "PasteCleanTests.xctest",
+      blueprintName: "PasteCleanTests"
+    )
+  }
+
+  private func buildableIdentity(from node: XMLNode) -> BuildableIdentity? {
+    guard let element = node as? XMLElement,
+          let blueprintIdentifier = element.attribute(forName: "BlueprintIdentifier")?.stringValue,
+          let buildableName = element.attribute(forName: "BuildableName")?.stringValue,
+          let blueprintName = element.attribute(forName: "BlueprintName")?.stringValue
+    else { return nil }
+
+    return BuildableIdentity(
+      blueprintIdentifier: blueprintIdentifier,
+      buildableName: buildableName,
+      blueprintName: blueprintName
+    )
+  }
+
   private var repositoryRootURL: URL {
     URL(fileURLWithPath: #filePath)
       .deletingLastPathComponent()
       .deletingLastPathComponent()
   }
+}
+
+private struct BuildableIdentity: Equatable {
+  let blueprintIdentifier: String
+  let buildableName: String
+  let blueprintName: String
 }
