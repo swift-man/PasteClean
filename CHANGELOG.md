@@ -26,3 +26,7 @@ PasteClean의 사용자 기능과 동작에 영향을 주는 주요 변경 사�
 - GitHub 안내 링크에서 새 이슈 작성 화면으로 바로 이동하도록 개선
 - 앱 에디터에서도 LF, CRLF, CR 및 Unicode 줄바꿈 방식을 보존
 - Tab과 Indent 폭 입력 필드를 화면 읽기 도구에서 구분할 수 있도록 개선
+
+### 수정
+
+- TestFlight로 설치한 Xcode Source Editor Extension이 Editor 메뉴에 표시되도록 필수 서명 식별자를 포함
