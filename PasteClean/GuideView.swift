@@ -44,7 +44,23 @@ enum GuideTopic: String, Identifiable {
   /// Shared so the menu can reach it without a property wrapper, which stops
   /// SwiftUI from dropping the command group.
   static let shared = GuideState()
-  @Published var topic: GuideTopic? = .app
+
+  @Published var topic: GuideTopic?
+
+  private static let hasPresentedAppGuideKey = "hasPresentedAppGuide"
+  private let defaults: UserDefaults
+
+  init(defaults: UserDefaults = .standard) {
+    self.defaults = defaults
+    topic = defaults.bool(forKey: Self.hasPresentedAppGuideKey) ? nil : .app
+  }
+
+  /// The automatic guide is onboarding, not a launch screen. Once it has
+  /// actually appeared, future launches stay in the main window.
+  func markAsPresented(_ topic: GuideTopic) {
+    guard topic == .app else { return }
+    defaults.set(true, forKey: Self.hasPresentedAppGuideKey)
+  }
 }
 
 /// Shown as a sheet, one step at a time.

@@ -23,12 +23,21 @@ struct ContentView: View {
 
   var body: some View {
     VStack(spacing: 0) {
+      aboutBar
+      Divider()
       usageBar
       Divider()
       HSplitView {
         pane(title: String(localized: "Input"), text: $input, placeholder: Self.inputPlaceholder)
-        pane(title: String(localized: "Output"), text: $output, placeholder: Self.outputPlaceholder) {
-          indentCharacterPicker
+        VStack(spacing: 0) {
+          pane(title: String(localized: "Output"), text: $output, placeholder: Self.outputPlaceholder)
+          Divider()
+          HStack {
+            indentationControls
+            Spacer(minLength: 0)
+          }
+          .padding(.horizontal, 10)
+          .padding(.vertical, 8)
         }
       }
       Divider()
@@ -40,7 +49,28 @@ struct ContentView: View {
       // new one at its first step instead of inheriting the old step number.
       GuideView(topic: topic) { guide.topic = $0 }
         .id(topic)
+        .onAppear { guide.markAsPresented(topic) }
     }
+  }
+
+  /// Project context and the public support path, kept at the very top of the
+  /// main window so users can find it without opening another screen.
+  private var aboutBar: some View {
+    HStack(alignment: .top, spacing: 10) {
+      Image(systemName: "info.circle.fill")
+        .foregroundStyle(.secondary)
+        .padding(.top, 1)
+      VStack(alignment: .leading, spacing: 2) {
+        Text("About PasteClean")
+          .font(.subheadline.weight(.semibold))
+        Text("The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean).")
+          .font(.callout)
+          .foregroundStyle(.secondary)
+      }
+      Spacer(minLength: 0)
+    }
+    .padding(.horizontal, 12)
+    .padding(.vertical, 8)
   }
 
   /// Always-visible summary of the workflow, so the steps are never hidden
@@ -61,22 +91,16 @@ struct ContentView: View {
       }
       .buttonStyle(.borderless)
       .help("Install the extension to use this inside Xcode.")
-      Button("Guide", systemImage: "questionmark.circle") { guide.topic = .app }
-        .buttonStyle(.borderless)
     }
     .padding(.horizontal, 12)
     .padding(.vertical, 8)
   }
 
   /// One titled editor with a copy button in its header and a placeholder.
-  ///
-  /// `controls` holds settings that describe this pane's own text — the
-  /// indentation character lives above Output because that is what it rewrites.
-  private func pane<Controls: View>(
+  private func pane(
     title: String,
     text: Binding<String>,
-    placeholder: String,
-    @ViewBuilder controls: () -> Controls = { EmptyView() }
+    placeholder: String
   ) -> some View {
     VStack(spacing: 0) {
       HStack(spacing: 10) {
@@ -84,7 +108,6 @@ struct ContentView: View {
           .font(.subheadline.weight(.semibold))
           .foregroundStyle(.secondary)
         Spacer()
-        controls()
         Button {
           copy(text.wrappedValue, label: title)
         } label: {
@@ -117,8 +140,6 @@ struct ContentView: View {
 
   private var toolbar: some View {
     HStack(spacing: 12) {
-      widths
-
       Text(status)
         .font(.callout)
         .foregroundStyle(.secondary)
@@ -135,32 +156,70 @@ struct ContentView: View {
     .padding(12)
   }
 
-  /// Which character the cleaner writes indentation with.
+  /// Output formatting controls laid out as a single inspector-style row.
   ///
-  /// Only the app needs this control: inside Xcode the extension reads the
-  /// editor's own setting, so the help text explains the choice on its own
-  /// terms rather than naming a preference the reader may never have seen.
-  private var indentCharacterPicker: some View {
-    Picker("", selection: $usesTabs) {
-      Text("Spaces").tag(false)
-      Text("Tabs").tag(true)
-    }
-    .pickerStyle(.segmented)
-    .frame(width: 130)
-    .labelsHidden()
-    .help("Whether the cleaned code is indented with spaces or with tab characters. Match whatever the file you are pasting into already uses — mixing the two is what makes indentation look ragged.")
-  }
+  /// These labels stay in English because they mirror Xcode's names exactly.
+  private var indentationControls: some View {
+    HStack(spacing: 8) {
+      settingLabel("Indent Using")
+      Menu {
+        Button {
+          usesTabs = false
+        } label: {
+          if usesTabs {
+            Text(verbatim: "Spaces")
+          } else {
+            Label {
+              Text(verbatim: "Spaces")
+            } icon: {
+              Image(systemName: "checkmark")
+            }
+          }
+        }
+        Button {
+          usesTabs = true
+        } label: {
+          if usesTabs {
+            Label {
+              Text(verbatim: "Tabs")
+            } icon: {
+              Image(systemName: "checkmark")
+            }
+          } else {
+            Text(verbatim: "Tabs")
+          }
+        }
+      } label: {
+        Color.clear
+      }
+      .menuStyle(.borderlessButton)
+      .menuIndicator(.hidden)
+      .buttonStyle(.plain)
+      .frame(width: Self.indentationPickerWidth, height: 22)
+      .background(Color.white.opacity(0.10), in: .rect(cornerRadius: 6))
+      .overlay {
+        HStack(spacing: 6) {
+          Text(verbatim: usesTabs ? "Tabs" : "Spaces")
+          Spacer(minLength: 0)
+          Image(systemName: "chevron.up.chevron.down")
+            .font(.system(size: 9, weight: .semibold))
+        }
+        .font(.system(size: 13, weight: .medium))
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 8)
+        .allowsHitTesting(false)
+      }
+      .overlay {
+        RoundedRectangle(cornerRadius: 6)
+          .strokeBorder(Color.white.opacity(0.04))
+      }
+      .contentShape(.rect)
+      .accessibilityLabel(Text(verbatim: "Indent Using"))
+      .accessibilityValue(Text(verbatim: usesTabs ? "Tabs" : "Spaces"))
+      .help("Whether the cleaned code is indented with spaces or with tab characters. Match whatever the file you are pasting into already uses — mixing the two is what makes indentation look ragged.")
 
-  /// Laid out like Xcode's own indentation widths control.
-  ///
-  /// The three labels are deliberately not localized: they name the same
-  /// settings an editor shows in English, and translating them only makes the
-  /// two harder to line up.
-  private var widths: some View {
-    HStack(spacing: 5) {
-      Text(verbatim: "Widths")
-        .font(.caption)
-        .foregroundStyle(.secondary)
+      settingLabel("Widths")
+        .padding(.leading, 4)
       widthField(
         "Tab",
         value: $tabWidth,
@@ -172,6 +231,13 @@ struct ContentView: View {
         help: String(localized: "How many columns one indentation level uses. Code pasted at 4 becomes 2 when this is 2.")
       )
     }
+    .controlSize(.small)
+    .fixedSize()
+  }
+
+  private func settingLabel(_ title: String) -> some View {
+    Text(verbatim: title)
+      .font(.system(size: 13, weight: .medium))
   }
 
   private func widthField(_ caption: String, value: Binding<Int>, help: String) -> some View {
@@ -185,20 +251,16 @@ struct ContentView: View {
         )
       }
     )
-    return VStack(spacing: 0) {
-      HStack(spacing: 0) {
-        TextField("", value: clampedValue, format: .number)
-          .textFieldStyle(.roundedBorder)
-          .multilineTextAlignment(.trailing)
-          .frame(width: 32)
-        Stepper("", value: clampedValue, in: supportedRange)
-          .labelsHidden()
-      }
-      Text(caption)
-        .font(.caption2)
-        .foregroundStyle(.secondary)
+    return HStack(spacing: 4) {
+      Text(verbatim: caption)
+        .font(.system(size: 13, weight: .medium))
+      TextField("", value: clampedValue, format: .number)
+        .textFieldStyle(.roundedBorder)
+        .multilineTextAlignment(.trailing)
+        .frame(width: 34)
+      Stepper("", value: clampedValue, in: supportedRange)
+        .labelsHidden()
     }
-    .controlSize(.small)
     .help(help)
   }
 
@@ -262,9 +324,8 @@ struct ContentView: View {
   /// Matches `LineNumberRulerView.ruleThickness`.
   private static let gutterWidth: CGFloat = 38
 
-  /// Every pane header stands this tall whatever controls it carries, so the
-  /// rule beneath it — and with it the top of both editors — lines up across
-  /// the split. Sized for the tallest control any header holds: Output's
-  /// segmented picker, which is 24pt, plus 6pt of air above and below.
+  private static let indentationPickerWidth: CGFloat = 126
+
+  /// Every pane header stands this tall so the rules and editor tops line up.
   private static let headerHeight: CGFloat = 36
 }

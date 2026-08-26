@@ -7,8 +7,16 @@
 
 import SwiftUI
 
+@MainActor
+private final class PasteCleanAppDelegate: NSObject, NSApplicationDelegate {
+  func applicationDidFinishLaunching(_ notification: Notification) {
+    HelpMenu.install()
+  }
+}
+
 @main
 struct PasteCleanApp: App {
+  @NSApplicationDelegateAdaptor(PasteCleanAppDelegate.self) private var appDelegate
   @AppStorage("showsLineNumbers") private var showsLineNumbers = true
   @StateObject private var guide = GuideState.shared
 
@@ -16,7 +24,6 @@ struct PasteCleanApp: App {
     WindowGroup("PasteClean") {
       ContentView()
         .environmentObject(guide)
-        .onAppear(perform: HelpMenu.install)
     }
     .defaultSize(width: 1040, height: 640)
     .commands {
