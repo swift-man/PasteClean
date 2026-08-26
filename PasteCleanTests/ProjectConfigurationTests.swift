@@ -44,7 +44,7 @@ struct ProjectConfigurationTests {
       encoding: .utf8
     )
     let marker = "CURRENT_PROJECT_VERSION = "
-    let buildNumbers = projectContents.split(separator: "\n").compactMap { line -> Int? in
+    let buildNumbers = projectContents.split(whereSeparator: \.isNewline).compactMap { line -> Int? in
       guard let markerRange = line.range(of: marker),
             let value = line[markerRange.upperBound...].split(separator: ";").first
       else { return nil }
