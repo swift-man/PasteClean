@@ -89,7 +89,7 @@ struct ContentView: View {
       Button("Xcode Extension", systemImage: "puzzlepiece.extension") {
         guide.topic = .xcodeExtension
       }
-      .buttonStyle(.borderless)
+      .buttonStyle(.bordered)
       .help("Install the extension to use this inside Xcode.")
     }
     .padding(.horizontal, 12)
