@@ -29,7 +29,7 @@ struct ProjectConfigurationTests {
 
     #expect(
       entitlements["com.apple.application-identifier"] as? String
-        == "$(DEVELOPMENT_TEAM).$(PRODUCT_BUNDLE_IDENTIFIER)"
+        == "$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)"
     )
     #expect(
       entitlements["com.apple.developer.team-identifier"] as? String
@@ -55,7 +55,8 @@ struct ProjectConfigurationTests {
     // six aligned prevents an embedded extension from carrying a stale build.
     #expect(buildNumbers.count == 6)
     #expect(Set(buildNumbers).count == 1)
-    #expect(buildNumbers.first.map { $0 >= 3 } == true)
+    let buildNumber = try #require(buildNumbers.first)
+    #expect(buildNumber >= 3)
   }
 
   private var projectFileURL: URL {
