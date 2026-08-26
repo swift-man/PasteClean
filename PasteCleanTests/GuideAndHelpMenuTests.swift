@@ -156,6 +156,25 @@ struct GuideAndHelpMenuTests {
     })
   }
 
+  @Test("The last submenu is used while AppKit is still building Help")
+  func resolvesTransientHelpMenuFallback() {
+    let mainMenu = NSMenu()
+    let fileMenu = NSMenu(title: "File")
+    let helpMenu = NSMenu(title: "Help")
+    let registeredHelpMenu = NSMenu(title: "Previously Registered Help")
+    mainMenu.addItem(NSMenuItem(title: "File", action: nil, keyEquivalent: ""))
+    mainMenu.setSubmenu(fileMenu, for: mainMenu.items[0])
+    mainMenu.addItem(NSMenuItem(title: "Help", action: nil, keyEquivalent: ""))
+    mainMenu.setSubmenu(helpMenu, for: mainMenu.items[1])
+
+    let resolved = HelpMenu.resolveHelpMenu(
+      in: mainMenu,
+      registeredHelpMenu: registeredHelpMenu
+    )
+
+    #expect(resolved === helpMenu)
+  }
+
   private func withFreshDefaults(_ body: (UserDefaults) -> Void) {
     let suiteName = "GuideAndHelpMenuTests.\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!

@@ -60,16 +60,29 @@ enum HelpMenu {
   }
 
   private static var helpMenu: NSMenu? {
-    let submenus = NSApp.mainMenu?.items.compactMap(\.submenu) ?? []
-    let menu = submenus.first { submenu in
+    let menu = resolveHelpMenu(
+      in: NSApp.mainMenu,
+      registeredHelpMenu: NSApp.helpMenu
+    )
+    if let menu { NSApp.helpMenu = menu }
+    return menu
+  }
+
+  /// Resolves the transient menu shapes SwiftUI creates while rebuilding the
+  /// menu bar. During that window the last submenu is the Help menu even
+  /// before AppKit has attached its standard Help item or identifier.
+  static func resolveHelpMenu(
+    in mainMenu: NSMenu?,
+    registeredHelpMenu: NSMenu?
+  ) -> NSMenu? {
+    let submenus = mainMenu?.items.compactMap(\.submenu) ?? []
+    return submenus.first { submenu in
       submenu.items.contains {
         $0.action == #selector(NSApplication.showHelp(_:))
           || $0.identifier == appHelpIdentifier
           || $0.identifier == extensionEntryIdentifier
       }
-    } ?? NSApp.mainMenu?.items.last?.submenu
-    if let menu { NSApp.helpMenu = menu }
-    return menu ?? NSApp.helpMenu
+    } ?? submenus.last ?? registeredHelpMenu
   }
 
   static let extensionEntry = (

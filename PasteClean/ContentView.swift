@@ -63,7 +63,7 @@ struct ContentView: View {
       VStack(alignment: .leading, spacing: 2) {
         Text("About PasteClean")
           .font(.subheadline.weight(.semibold))
-        Text("The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean).")
+        Text("The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean/issues/new).")
           .font(.callout)
           .foregroundStyle(.secondary)
       }
@@ -271,16 +271,14 @@ struct ContentView: View {
       status = String(localized: "Paste the code you want to clean.")
       return
     }
-    let lines = CodeCleaner.splitLines(in: input)
-    let cleaned = CodeCleaner.clean(
-      lines: lines,
+    output = CodeCleaner.clean(
+      text: input,
       style: IndentationStyle(
         usesTabs: usesTabs,
         indentationWidth: indentationWidth,
         tabWidth: tabWidth
       )
     )
-    output = cleaned.joined(separator: "\n")
     // A clean that changed something speaks for itself in the Output pane; the
     // line says something only when nothing happened.
     status = output == input ? String(localized: "Nothing to clean.") : ""

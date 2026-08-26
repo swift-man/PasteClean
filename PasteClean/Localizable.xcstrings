@@ -607,19 +607,19 @@
         }
       }
     },
-    "The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean)." : {
+    "The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean/issues/new)." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean)."
+            "value" : "The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean/issues/new)."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PasteClean 에디터와 Xcode 확장 프로그램은 오픈 소스입니다. 문의나 버그 제보는 [GitHub에 새 이슈를 등록해 주세요](https://github.com/swift-man/PasteClean)."
+            "value" : "PasteClean 에디터와 Xcode 확장 프로그램은 오픈 소스입니다. 문의나 버그 제보는 [GitHub에 새 이슈를 등록해 주세요](https://github.com/swift-man/PasteClean/issues/new)."
           }
         }
       }
