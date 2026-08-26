@@ -258,8 +258,11 @@ struct ContentView: View {
         .textFieldStyle(.roundedBorder)
         .multilineTextAlignment(.trailing)
         .frame(width: 34)
-      Stepper("", value: clampedValue, in: supportedRange)
-        .labelsHidden()
+        .accessibilityLabel(Text(verbatim: caption))
+      Stepper(value: clampedValue, in: supportedRange) {
+        Text(verbatim: caption)
+      }
+      .labelsHidden()
     }
     .help(help)
   }
