@@ -1,8 +1,9 @@
 # PasteClean
 
-An Xcode source editor extension that cleans up code pasted from a rendered
-Markdown code block — the blank line between every line, the trailing
-whitespace, the indentation that doesn't match your project.
+A standalone macOS code-cleaning editor and Xcode source editor extension that
+clean up code pasted from a rendered Markdown code block — the blank line
+between every line, the trailing whitespace, the indentation that doesn't
+match your project.
 
 Indentation is rewritten using your project's own Xcode settings (tabs or
 spaces, and the width), while continuation-line alignment and multi-line string
@@ -28,7 +29,7 @@ the right. Handy when the code isn't headed for Xcode. The output controls let
 you choose spaces or tabs and set the tab and indentation widths; toggle line
 numbers with `⇧⌘L`.
 
-For a walkthrough, open **Help ▸ How to use PasteClean**. Its three-step guide
+For a walkthrough, open **Help ▸ PasteClean Help**. Its three-step guide
 shows what gets fixed, how to use the app, and then hands off directly to the
 Xcode extension setup guide.
 
