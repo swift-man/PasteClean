@@ -42,19 +42,19 @@
         }
       }
     },
-    "Assign a shortcut" : {
+    "Assign a shortcut (optional)" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Assign a shortcut"
+            "value" : "Assign a shortcut (optional)"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "단축키 지정"
+            "value" : "단축키 지정 (선택 사항)"
           }
         }
       }
@@ -841,6 +841,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "결과 헤더의 복사 버튼으로 정리된 코드를 가져갑니다."
+          }
+        }
+      }
+    },
+    "The command appears in the Editor menu without a shortcut." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The command appears in the Editor menu without a shortcut."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단축키를 지정하지 않아도 Editor 메뉴에 명령이 표시됩니다."
           }
         }
       }

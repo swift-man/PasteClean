@@ -10,6 +10,15 @@ import Testing
 @MainActor
 struct GuideAndHelpMenuTests {
 
+  @Test("The extension guide marks shortcut assignment as optional")
+  func extensionGuideMarksShortcutAsOptional() {
+    #expect(GuideTopic.xcodeExtension.stepTitles.count == 3)
+    #expect(
+      GuideTopic.xcodeExtension.stepTitles[1]
+        == String(localized: "Assign a shortcut (optional)")
+    )
+  }
+
   @Test("The app guide is shown until its first actual presentation")
   func appGuideIsOneTimeOnboarding() {
     withFreshDefaults { defaults in

@@ -32,7 +32,7 @@ enum GuideTopic: String, Identifiable {
     ]
     case .xcodeExtension: [
       String(localized: "Enable the extension"),
-      String(localized: "Assign a shortcut"),
+      String(localized: "Assign a shortcut (optional)"),
       String(localized: "Use it in Xcode")
     ]
     }
@@ -215,6 +215,8 @@ struct GuideView: View {
 
   private var shortcutStep: some View {
     VStack(alignment: .leading, spacing: 16) {
+      Text("The command appears in the Editor menu without a shortcut.")
+        .fixedSize(horizontal: false, vertical: true)
       MenuPath(items: ["Xcode", "Settings", "Shortcuts"])
       Steps(items: [
         "Open that pane.",

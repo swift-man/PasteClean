@@ -59,6 +59,10 @@ Build Phase를 확인하세요.
   `PasteClean.xcodeproj/xcshareddata/xcschemes/`에서 저장소와 함께 관리합니다.
   `PasteClean` 스킴은 호스트 앱만 Release Archive 대상으로 유지해야 다른
   Mac에서도 내장 Xcode 확장 프로그램을 포함한 App Store Archive를 만듭니다.
+- Xcode 확장 프로그램은 연결한 `XcodeKit.framework`를 `Embed & Sign`으로
+  포함해야 합니다. 링크만 하면 빌드가 성공해도 설치 후 확장을 불러오지 못할
+  수 있습니다. Archive와 내보낸 앱의 확인 경로는 [README.md](README.md)의
+  배포 안내를 따르세요.
 - `HelpMenu`는 SwiftUI가 메인 메뉴를 재구성하는 동작을 보완합니다. 표준
   도움말 항목과 메뉴 delegate가 사라지지 않도록 앱 시작 직후 재부착하고,
   메뉴 tracking 시점에도 다시 연결합니다. 실제 메뉴 검증 없이 단순한
@@ -81,7 +85,7 @@ Build Phase를 확인하세요.
 ## 문서와 릴리스
 
 - `VERSION.txt`는 모든 타깃의 `MARKETING_VERSION`과 일치시킵니다.
-- 사용자 동작이 바뀌면 `CHANGELOG.md`와 필요한 경우 `README.md`도 같은
-  변경에서 갱신합니다.
+- 사용자 동작이 바뀌면 [CHANGELOG.md](CHANGELOG.md)와 필요한 경우
+  [README.md](README.md)도 같은 변경에서 갱신합니다.
 - 사용자에게 보이는 문자열은 `PasteClean/Localizable.xcstrings`에 영어와
   한국어 번역을 함께 추가하고 `jq empty`로 형식을 검증하세요.

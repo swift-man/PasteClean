@@ -27,6 +27,7 @@
 		AA0900000000000000000001 /* ProjectConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0900000000000000000002 /* ProjectConfigurationTests.swift */; };
 		AA0200000000000000000001 /* CodeCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */; };
 		0F1A8A5907F8429FD27AE19F /* XcodeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10E6DA89C1E917289EB1C39C /* XcodeKit.framework */; };
+		AA1200000000000000000001 /* XcodeKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 10E6DA89C1E917289EB1C39C /* XcodeKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		30A1B4C7E2D5F08931746A2B /* CodeCleanerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E5A97B1C4D60F83A2B7E15 /* CodeCleanerTests.swift */; };
 		31C8D0F3A6B94E27051D8C3A /* CodeCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E53D49F411A0F4D73D7ABD7 /* CodeCleaner.swift */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		AA1200000000000000000002 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AA1200000000000000000001 /* XcodeKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		14F4E97D206BEDF00FBDE7BD /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -186,6 +198,7 @@
 				2733F7BA9E692353B9C4327F /* Sources */,
 				1B6790D7B8048983BCB33A18 /* Frameworks */,
 				28B19E8EE4BE487FF93FDF6E /* Resources */,
+				AA1200000000000000000002 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -421,7 +434,7 @@
 				CODE_SIGN_ENTITLEMENTS = PasteClean/PasteClean.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -448,7 +461,7 @@
 				CODE_SIGN_ENTITLEMENTS = PasteClean/PasteClean.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -472,7 +485,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PasteCleanExtension/PasteCleanExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -500,7 +513,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PasteCleanExtension/PasteCleanExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -527,7 +540,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -546,7 +559,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (

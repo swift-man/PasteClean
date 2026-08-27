@@ -19,8 +19,9 @@ intercepts ⌘V or uses the Accessibility API.
 
 ## Use
 
-Select the code and run **Editor ▸ PasteClean ▸ Clean Pasted Code**. Assign a
-shortcut in Xcode ▸ Settings ▸ Shortcuts — `⌥O` is recommended.
+Select the code and run **Editor ▸ PasteClean ▸ Clean Pasted Code**. No keyboard
+shortcut is required for the menu to appear or work. Optionally assign one in
+Xcode ▸ Settings ▸ Shortcuts — `⌥O` is recommended.
 
 With nothing selected it cleans the whole file, and `⌘Z` undoes it. Multiple
 selections are cleaned independently and remain selected.
@@ -50,5 +51,13 @@ The suite includes deterministic large-file work counters for end-to-end
 multi-selection planning and an in-memory editor-buffer integration test that
 verifies edit ordering and resulting selections. Xcode extension discovery and
 the host's native undo UI still require a manual check inside Xcode.
+
+For TestFlight and App Store distribution, archive the shared **PasteClean**
+scheme, which builds the host app and its embedded extension. The extension
+target must **Embed & Sign** `XcodeKit.framework`, not just link it. Check that
+the archived and exported app contains
+`Contents/PlugIns/PasteCleanExtension.appex/Contents/Frameworks/XcodeKit.framework`.
+After installing the new TestFlight build, enable the extension, restart Xcode,
+and verify the Editor menu command with a source file open and no shortcut set.
 
 Localized in English and Korean.
