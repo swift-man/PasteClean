@@ -55,7 +55,7 @@ struct ContentView: View {
         Text("The PasteClean editor and its Xcode extension are open source.")
           .font(.callout)
           .foregroundStyle(.secondary)
-        Text("[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [Questions or bug reports](https://github.com/swift-man/PasteClean/issues/new)")
+        Text("[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [For questions or bug reports, please open an issue.](https://github.com/swift-man/PasteClean/issues/new)")
           .font(.callout)
           .foregroundStyle(.secondary)
       }

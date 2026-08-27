@@ -607,20 +607,20 @@
         }
       }
     },
-    "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [Questions or bug reports](https://github.com/swift-man/PasteClean/issues/new)" : {
+    "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [For questions or bug reports, please open an issue.](https://github.com/swift-man/PasteClean/issues/new)" : {
       "comment" : "Keep the repository address visible and both link destinations unchanged.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [Questions or bug reports](https://github.com/swift-man/PasteClean/issues/new)"
+            "value" : "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [For questions or bug reports, please open an issue.](https://github.com/swift-man/PasteClean/issues/new)"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [문의·버그 제보](https://github.com/swift-man/PasteClean/issues/new)"
+            "value" : "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [문의 사항이나 버그는 GitHub 이슈로 알려 주세요.](https://github.com/swift-man/PasteClean/issues/new)"
           }
         }
       }
