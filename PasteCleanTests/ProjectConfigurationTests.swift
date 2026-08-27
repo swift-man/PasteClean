@@ -37,6 +37,53 @@ struct ProjectConfigurationTests {
     )
   }
 
+  @Test("The extension embeds and signs the linked XcodeKit framework in every build")
+  func extensionEmbedsXcodeKit() throws {
+    let project = try #require(
+      PropertyListSerialization.propertyList(
+        from: Data(contentsOf: projectFileURL), format: nil
+      ) as? [String: Any]
+    )
+    let objects = try #require(project["objects"] as? [String: [String: Any]])
+    let target = try #require(objects.values.first {
+      $0["isa"] as? String == "PBXNativeTarget"
+        && $0["name"] as? String == "PasteCleanExtension"
+    })
+    let phaseIDs = try #require(target["buildPhases"] as? [String])
+    let phases = try phaseIDs.map { try #require(objects[$0]) }
+    let embedPhase = try #require(phases.first {
+      $0["isa"] as? String == "PBXCopyFilesBuildPhase"
+        && $0["dstSubfolderSpec"] as? String == "10"
+    })
+
+    // XcodeKit is not a system framework: linking alone builds successfully
+    // but leaves Xcode unable to load the installed extension.
+    #expect(embedPhase["dstPath"] as? String == "")
+    #expect(embedPhase["buildActionMask"] as? String == "2147483647")
+    #expect(embedPhase["runOnlyForDeploymentPostprocessing"] as? String == "0")
+
+    let embeddedFileIDs = try #require(embedPhase["files"] as? [String])
+    let embeddedFiles = try embeddedFileIDs.map { try #require(objects[$0]) }
+    let embeddedFramework = try #require(embeddedFiles.first { file in
+      guard let referenceID = file["fileRef"] as? String else { return false }
+      return objects[referenceID]?["path"] as? String
+        == "Library/Frameworks/XcodeKit.framework"
+    })
+    let frameworkID = try #require(embeddedFramework["fileRef"] as? String)
+    #expect(objects[frameworkID]?["sourceTree"] as? String == "DEVELOPER_DIR")
+
+    let settings = try #require(embeddedFramework["settings"] as? [String: Any])
+    let attributes = try #require(settings["ATTRIBUTES"] as? [String])
+    #expect(attributes.contains("CodeSignOnCopy"))
+    #expect(attributes.contains("RemoveHeadersOnCopy"))
+
+    let linkPhase = try #require(phases.first {
+      $0["isa"] as? String == "PBXFrameworksBuildPhase"
+    })
+    let linkedFileIDs = try #require(linkPhase["files"] as? [String])
+    #expect(linkedFileIDs.contains { objects[$0]?["fileRef"] as? String == frameworkID })
+  }
+
   @Test("App, extension, and tests use one advanced TestFlight build number")
   func testFlightBuildNumbersStaySynchronized() throws {
     let projectContents = try String(
@@ -56,7 +103,7 @@ struct ProjectConfigurationTests {
     #expect(buildNumbers.count == 6)
     #expect(Set(buildNumbers).count == 1)
     let buildNumber = try #require(buildNumbers.first)
-    #expect(buildNumber >= 3)
+    #expect(buildNumber >= 4)
   }
 
   @Test("The shared app scheme archives the host app")
