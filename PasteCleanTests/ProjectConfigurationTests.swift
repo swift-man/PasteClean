@@ -69,7 +69,7 @@ struct ProjectConfigurationTests {
     let archiveBuildEntries = try schemeDocument.nodes(
       forXPath: "//BuildActionEntry[@buildForArchiving='YES']/BuildableReference"
     )
-    let archivedProducts = archiveBuildEntries.compactMap(buildableIdentity)
+    let archivedProducts = try archiveBuildEntries.map(buildableIdentity)
     #expect(archivedProducts == [appBuildableIdentity])
 
     let archiveActions = try schemeDocument.nodes(
@@ -81,7 +81,7 @@ struct ProjectConfigurationTests {
       forXPath: "//BuildableProductRunnable/BuildableReference"
     )
     #expect(
-      runnableReferences.compactMap(buildableIdentity)
+      try runnableReferences.map(buildableIdentity)
         == [appBuildableIdentity, appBuildableIdentity]
     )
   }
@@ -97,7 +97,7 @@ struct ProjectConfigurationTests {
     )
 
     #expect(
-      testableReferences.compactMap(buildableIdentity)
+      try testableReferences.map(buildableIdentity)
         == [testBuildableIdentity]
     )
   }
@@ -141,12 +141,17 @@ struct ProjectConfigurationTests {
     )
   }
 
-  private func buildableIdentity(from node: XMLNode) -> BuildableIdentity? {
-    guard let element = node as? XMLElement,
-          let blueprintIdentifier = element.attribute(forName: "BlueprintIdentifier")?.stringValue,
-          let buildableName = element.attribute(forName: "BuildableName")?.stringValue,
-          let blueprintName = element.attribute(forName: "BlueprintName")?.stringValue
-    else { return nil }
+  private func buildableIdentity(from node: XMLNode) throws -> BuildableIdentity {
+    let element = try #require(node as? XMLElement)
+    let blueprintIdentifier = try #require(
+      element.attribute(forName: "BlueprintIdentifier")?.stringValue
+    )
+    let buildableName = try #require(
+      element.attribute(forName: "BuildableName")?.stringValue
+    )
+    let blueprintName = try #require(
+      element.attribute(forName: "BlueprintName")?.stringValue
+    )
 
     return BuildableIdentity(
       blueprintIdentifier: blueprintIdentifier,
