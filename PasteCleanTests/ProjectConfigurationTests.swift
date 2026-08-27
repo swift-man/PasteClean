@@ -77,12 +77,18 @@ struct ProjectConfigurationTests {
     )
     #expect(archiveActions.count == 1)
 
-    let runnableReferences = try schemeDocument.nodes(
-      forXPath: "//BuildableProductRunnable/BuildableReference"
+    let launchReferences = try schemeDocument.nodes(
+      forXPath: "/Scheme/LaunchAction/BuildableProductRunnable/BuildableReference"
     )
     #expect(
-      try runnableReferences.map(buildableIdentity)
-        == [appBuildableIdentity, appBuildableIdentity]
+      try launchReferences.map(buildableIdentity) == [appBuildableIdentity]
+    )
+
+    let profileReferences = try schemeDocument.nodes(
+      forXPath: "/Scheme/ProfileAction/BuildableProductRunnable/BuildableReference"
+    )
+    #expect(
+      try profileReferences.map(buildableIdentity) == [appBuildableIdentity]
     )
   }
 
