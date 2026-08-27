@@ -55,6 +55,10 @@ Build Phase를 확인하세요.
 
 ## 저장소 특성 및 함정
 
+- `PasteClean`과 `PasteCleanTests` 스킴은
+  `PasteClean.xcodeproj/xcshareddata/xcschemes/`에서 저장소와 함께 관리합니다.
+  `PasteClean` 스킴은 호스트 앱만 Release Archive 대상으로 유지해야 다른
+  Mac에서도 내장 Xcode 확장 프로그램을 포함한 App Store Archive를 만듭니다.
 - `HelpMenu`는 SwiftUI가 메인 메뉴를 재구성하는 동작을 보완합니다. 표준
   도움말 항목과 메뉴 delegate가 사라지지 않도록 앱 시작 직후 재부착하고,
   메뉴 tracking 시점에도 다시 연결합니다. 실제 메뉴 검증 없이 단순한

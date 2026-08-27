@@ -30,3 +30,4 @@ PasteClean의 사용자 기능과 동작에 영향을 주는 주요 변경 사�
 ### 수정
 
 - TestFlight로 설치한 Xcode Source Editor Extension이 Editor 메뉴에 표시되도록 필수 서명 식별자를 포함
+- 다른 Mac에서도 호스트 앱을 App Store 배포용 Archive 대상으로 일관되게 선택할 수 있도록 공유 앱 스킴을 포함
