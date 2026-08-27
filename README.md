@@ -1,5 +1,12 @@
 # PasteClean
 
+![Swift](https://img.shields.io/badge/Swift-white.svg?style=flat-square&logo=swift)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-001b87.svg?style=flat-square&logo=swift&logoColor=white)
+[![Version: 1.0](https://img.shields.io/badge/Version-1.0-1177AA?style=flat-square)](VERSION.txt)
+![Platform: macOS 14.0+](https://img.shields.io/badge/platform-macOS%2014.0%2B-yellow?style=flat-square)
+![Xcode Source Editor Extension](https://img.shields.io/badge/Xcode-Source%20Editor%20Extension-1575F9?style=flat-square&logo=xcode&logoColor=white)
+[![License: LGPL-3.0-or-later](https://img.shields.io/badge/license-LGPL--3.0--or--later-black?style=flat-square)](LICENSE)
+
 PasteClean is both a standalone macOS code-cleaning editor and an Xcode source
 editor extension. Both clean up code pasted from a rendered Markdown code
 block — the blank line between every line, the trailing whitespace, and
@@ -65,3 +72,19 @@ After installing the new TestFlight build, enable the extension, restart Xcode,
 and verify the Editor menu command with a source file open and no shortcut set.
 
 Localized in English and Korean.
+
+## License
+
+PasteClean, including the standalone macOS editor and Xcode Source Editor
+Extension, is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version (`LGPL-3.0-or-later`).
+
+PasteClean is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See [LICENSE](LICENSE) for the LGPL v3 terms and
+[COPYING](COPYING) for the GPL v3 terms incorporated by LGPL v3.
+
+Third-party components, including Apple's `XcodeKit.framework`, remain subject
+to their respective licenses; this license does not replace those terms.
