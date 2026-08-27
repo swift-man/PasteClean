@@ -7,9 +7,9 @@ indentation that doesn't match your project.
 
 In the app, Output controls choose tabs or spaces and their widths. In Xcode,
 indentation follows the editor's own settings. Both preserve continuation-line
-alignment and multi-line string literals. The app cleans only when you choose
-Clean, and the extension runs only as an Editor menu command; neither
-intercepts ⌘V or uses the Accessibility API.
+alignment and multi-line string literals. The app cleans when you choose Paste
+or Clean, and the extension runs only as an Editor menu command; neither changes
+paste behavior in other apps or uses the Accessibility API.
 
 ## Install
 
