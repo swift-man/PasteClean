@@ -6,6 +6,7 @@ review:
     - "**/*.plist"
     - "**/*.entitlements"
     - "**/*.pbxproj"
+    - "**/xcshareddata/xcschemes/*.xcscheme"
     - "**/*.xcstrings"
     - "**/*.xcassets/**/Contents.json"
     - "**/Package.resolved"
