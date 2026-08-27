@@ -74,8 +74,9 @@ Build Phase를 확인하세요.
   합니다.
 - 편집기 두 패널의 헤더는 공용 `headerHeight`를 사용합니다. 한쪽만 수정해
   헤더 아래 구분선이 어긋나지 않게 하세요.
-- `Indent Using`, `Widths`, `Tab`, `Indent` 설정은 Output 패널 하단에서 한
-  줄로 표시됩니다. 최소 창 너비 980pt에서 잘리지 않아야 합니다.
+- 에디터 밖 공용 하단 푸터의 왼쪽에는 Input의 붙여넣기·정리 버튼을,
+  오른쪽에는 Output의 `Indent Using`, `Widths`, `Tab`, `Indent` 설정을
+  한 줄로 표시합니다. 최소 창 너비 980pt에서 잘리지 않아야 합니다.
 - 들여쓰기 설정은 `@AppStorage`로 저장됩니다. 기본값과 달라지기 전에는
   preferences plist에 키가 없을 수 있습니다.
 - 편집기 패널 폭이 좁으면 긴 줄을 word wrap합니다. 긴 토큰이 다음 줄의
