@@ -535,19 +535,36 @@
         }
       }
     },
-    "Paste into Input on the left. ⌘V goes there no matter what has focus." : {
+    "Paste or edit code in Input. ⌘V pastes at the cursor. ⇧⌘V replaces Input and cleans it." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paste into Input on the left. ⌘V goes there no matter what has focus."
+            "value" : "Paste or edit code in Input. ⌘V pastes at the cursor. ⇧⌘V replaces Input and cleans it."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "왼쪽 입력에 붙여넣습니다. ⌘V를 누르면 어디에 포커스가 있든 입력으로 들어갑니다."
+            "value" : "입력에서 코드를 붙여넣거나 편집하세요. ⌘V는 커서 위치에 붙여넣고, ⇧⌘V는 입력 전체를 교체한 뒤 정리합니다."
+          }
+        }
+      }
+    },
+    "Replace Input with the clipboard and clean it (⇧⌘V)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Input with the clipboard and clean it (⇧⌘V)."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "클립보드의 내용으로 입력 전체를 교체한 뒤 정리합니다 (⇧⌘V)."
           }
         }
       }

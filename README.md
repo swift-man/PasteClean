@@ -26,10 +26,14 @@ Xcode ▸ Settings ▸ Shortcuts — `⌥O` is recommended.
 With nothing selected it cleans the whole file, and `⌘Z` undoes it. Multiple
 selections are cleaned independently and remain selected.
 
-The app works on its own too: paste on the left, take the cleaned result from
-the right. Handy when the code isn't headed for Xcode. The output controls let
-you choose spaces or tabs and set the tab and indentation widths; toggle line
-numbers with `⇧⌘L`.
+The app works on its own too: paste or edit on the left, then choose **Clean**
+(`⌥O`) and take the result from the right. `⌘V` pastes at the cursor or replaces
+the selected text in the focused editor, with standard `⌘Z` undo. The **Paste**
+button (`⇧⌘V`) replaces all of Input with the clipboard and cleans it at once.
+Handy when the code isn't headed for Xcode. The output controls let you choose
+spaces or tabs and set the tab and indentation widths; choose **Clean** to apply
+changed settings. Output remains editable and is not overwritten just by
+changing a setting. Toggle line numbers with `⇧⌘L`.
 
 For a walkthrough, open **Help ▸ PasteClean Help**. Its three-step guide
 shows what gets fixed, how to use the app, and then hands off directly to the

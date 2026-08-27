@@ -122,7 +122,7 @@ struct ContentView: View {
         .font(.callout)
         .foregroundStyle(.secondary)
         .lineLimit(1)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .center)
         .help(status)
       indentationControls
     }
@@ -133,8 +133,11 @@ struct ContentView: View {
   private var inputActions: some View {
     HStack(spacing: 12) {
       Button("Paste", systemImage: "doc.on.clipboard", action: pasteIntoInput)
-        .keyboardShortcut("v", modifiers: .command)
+        // Leave standard paste on the text editor's responder chain so partial
+        // edits keep their selection and native undo history.
+        .keyboardShortcut("v", modifiers: [.command, .shift])
         .buttonStyle(.bordered)
+        .help("Replace Input with the clipboard and clean it (⇧⌘V).")
       Button("Clean", systemImage: "wand.and.sparkles", action: clean)
         .keyboardShortcut("o", modifiers: .option)
         .buttonStyle(.borderedProminent)
@@ -273,7 +276,7 @@ struct ContentView: View {
     status = output == input ? String(localized: "Nothing to clean.") : ""
   }
 
-  /// ⌘V anywhere in the window drops the clipboard into the left pane and cleans it.
+  /// The Paste button and ⇧⌘V explicitly replace Input and clean it.
   private func pasteIntoInput() {
     guard let pasted = NSPasteboard.general.string(forType: .string) else {
       status = String(localized: "The clipboard has no text.")

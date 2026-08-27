@@ -169,7 +169,7 @@ struct GuideView: View {
     VStack(alignment: .leading, spacing: 16) {
       WindowSketch(before: Self.before, after: Self.after)
       Steps(items: [
-        "Paste into Input on the left. ⌘V goes there no matter what has focus.",
+        "Paste or edit code in Input. ⌘V pastes at the cursor. ⇧⌘V replaces Input and cleans it.",
         "Press ⌥O, or the Clean button, and the result appears in Output on the right.",
         "Take the result with the Copy button in the Output header.",
         "Hover any indentation control for an explanation of what it does."
@@ -360,7 +360,7 @@ private struct WindowSketch: View {
         Text(verbatim: "Widths")
           .foregroundStyle(.secondary)
         ForEach(["Tab", "Indent"], id: \.self) { caption in
-          Text(verbatim: "4  \(caption)")
+          Text(verbatim: "\(caption)  4")
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 4))
