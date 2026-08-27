@@ -535,36 +535,36 @@
         }
       }
     },
-    "Paste ⌘V → Clean ⌥O → Copy from the right" : {
+    "Paste or edit code in Input. ⌘V pastes at the cursor. ⇧⌘V replaces Input and cleans it." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paste ⌘V → Clean ⌥O → Copy from the right"
+            "value" : "Paste or edit code in Input. ⌘V pastes at the cursor. ⇧⌘V replaces Input and cleans it."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "붙여넣기 ⌘V → 정리 ⌥O → 오른쪽에서 복사"
+            "value" : "입력에서 코드를 붙여넣거나 편집하세요. ⌘V는 커서 위치에 붙여넣고, ⇧⌘V는 입력 전체를 교체한 뒤 정리합니다."
           }
         }
       }
     },
-    "Paste into Input on the left. ⌘V goes there no matter what has focus." : {
+    "Replace Input with the clipboard and clean it (⇧⌘V)." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paste into Input on the left. ⌘V goes there no matter what has focus."
+            "value" : "Replace Input with the clipboard and clean it (⇧⌘V)."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "왼쪽 입력에 붙여넣습니다. ⌘V를 누르면 어디에 포커스가 있든 입력으로 들어갑니다."
+            "value" : "클립보드의 내용으로 입력 전체를 교체한 뒤 정리합니다 (⇧⌘V)."
           }
         }
       }
@@ -607,19 +607,37 @@
         }
       }
     },
-    "The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean/issues/new)." : {
+    "The PasteClean editor and its Xcode extension are open source." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean/issues/new)."
+            "value" : "The PasteClean editor and its Xcode extension are open source."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PasteClean 에디터와 Xcode 확장 프로그램은 오픈 소스입니다. 문의나 버그 제보는 [GitHub에 새 이슈를 등록해 주세요](https://github.com/swift-man/PasteClean/issues/new)."
+            "value" : "PasteClean 에디터와 Xcode 확장 프로그램은 오픈 소스입니다."
+          }
+        }
+      }
+    },
+    "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [For questions or bug reports, please open an issue.](https://github.com/swift-man/PasteClean/issues/new)" : {
+      "comment" : "Keep the repository address visible and both link destinations unchanged.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [For questions or bug reports, please open an issue.](https://github.com/swift-man/PasteClean/issues/new)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [문의 사항이나 버그는 GitHub 이슈로 알려 주세요.](https://github.com/swift-man/PasteClean/issues/new)"
           }
         }
       }
@@ -637,23 +655,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "⌥O를 누르거나 정리 버튼을 누르면 오른쪽 결과에 정리된 코드가 나옵니다."
-          }
-        }
-      }
-    },
-    "Removes blank lines and trailing whitespace, then rewrites indentation." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Removes blank lines and trailing whitespace, then rewrites indentation."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "빈 줄과 줄 끝 공백을 지우고 들여쓰기를 다시 씁니다."
           }
         }
       }

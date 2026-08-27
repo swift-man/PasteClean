@@ -25,23 +25,12 @@ struct ContentView: View {
     VStack(spacing: 0) {
       aboutBar
       Divider()
-      usageBar
-      Divider()
       HSplitView {
         pane(title: String(localized: "Input"), text: $input, placeholder: Self.inputPlaceholder)
-        VStack(spacing: 0) {
-          pane(title: String(localized: "Output"), text: $output, placeholder: Self.outputPlaceholder)
-          Divider()
-          HStack {
-            indentationControls
-            Spacer(minLength: 0)
-          }
-          .padding(.horizontal, 10)
-          .padding(.vertical, 8)
-        }
+        pane(title: String(localized: "Output"), text: $output, placeholder: Self.outputPlaceholder)
       }
       Divider()
-      toolbar
+      footer
     }
     .frame(minWidth: 980, minHeight: 480)
     .sheet(item: $guide.topic) { topic in
@@ -60,31 +49,16 @@ struct ContentView: View {
       Image(systemName: "info.circle.fill")
         .foregroundStyle(.secondary)
         .padding(.top, 1)
-      VStack(alignment: .leading, spacing: 2) {
+      VStack(alignment: .leading, spacing: 4) {
         Text("About PasteClean")
           .font(.subheadline.weight(.semibold))
-        Text("The PasteClean editor and its Xcode extension are open source. For questions or bug reports, [open an issue on GitHub](https://github.com/swift-man/PasteClean/issues/new).")
+        Text("The PasteClean editor and its Xcode extension are open source.")
+          .font(.callout)
+          .foregroundStyle(.secondary)
+        Text("[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [For questions or bug reports, please open an issue.](https://github.com/swift-man/PasteClean/issues/new)")
           .font(.callout)
           .foregroundStyle(.secondary)
       }
-      Spacer(minLength: 0)
-    }
-    .padding(.horizontal, 12)
-    .padding(.vertical, 8)
-  }
-
-  /// Always-visible summary of the workflow, so the steps are never hidden
-  /// behind a hover or a sheet.
-  private var usageBar: some View {
-    HStack(spacing: 10) {
-      Image(systemName: "wand.and.sparkles")
-        .foregroundStyle(.tint)
-      Text("Paste ⌘V → Clean ⌥O → Copy from the right")
-        .font(.callout.weight(.medium))
-      Text("Removes blank lines and trailing whitespace, then rewrites indentation.")
-        .font(.callout)
-        .foregroundStyle(.secondary)
-        .lineLimit(1)
       Spacer(minLength: 12)
       Button("Xcode Extension", systemImage: "puzzlepiece.extension") {
         guide.topic = .xcodeExtension
@@ -138,22 +112,37 @@ struct ContentView: View {
     .frame(minWidth: 380)
   }
 
-  private var toolbar: some View {
+  /// Keep both editors equally tall. Input actions stay on the left and
+  /// output settings on the right, outside the resizable editor panes.
+  private var footer: some View {
     HStack(spacing: 12) {
+      inputActions
+        .fixedSize()
       Text(status)
         .font(.callout)
         .foregroundStyle(.secondary)
         .lineLimit(1)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .help(status)
+      indentationControls
+    }
+    .padding(.horizontal, 12)
+    .padding(.vertical, 10)
+  }
 
+  private var inputActions: some View {
+    HStack(spacing: 12) {
       Button("Paste", systemImage: "doc.on.clipboard", action: pasteIntoInput)
-        .keyboardShortcut("v", modifiers: .command)
+        // Leave standard paste on the text editor's responder chain so partial
+        // edits keep their selection and native undo history.
+        .keyboardShortcut("v", modifiers: [.command, .shift])
+        .buttonStyle(.bordered)
+        .help("Replace Input with the clipboard and clean it (⇧⌘V).")
       Button("Clean", systemImage: "wand.and.sparkles", action: clean)
         .keyboardShortcut("o", modifiers: .option)
         .buttonStyle(.borderedProminent)
         .disabled(input.isEmpty)
     }
-    .padding(12)
   }
 
   /// Output formatting controls laid out as a single inspector-style row.
@@ -287,7 +276,7 @@ struct ContentView: View {
     status = output == input ? String(localized: "Nothing to clean.") : ""
   }
 
-  /// ⌘V anywhere in the window drops the clipboard into the left pane and cleans it.
+  /// The Paste button and ⇧⌘V explicitly replace Input and clean it.
   private func pasteIntoInput() {
     guard let pasted = NSPasteboard.general.string(forType: .string) else {
       status = String(localized: "The clipboard has no text.")

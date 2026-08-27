@@ -169,7 +169,7 @@ struct GuideView: View {
     VStack(alignment: .leading, spacing: 16) {
       WindowSketch(before: Self.before, after: Self.after)
       Steps(items: [
-        "Paste into Input on the left. ⌘V goes there no matter what has focus.",
+        "Paste or edit code in Input. ⌘V pastes at the cursor. ⇧⌘V replaces Input and cleans it.",
         "Press ⌥O, or the Clean button, and the result appears in Output on the right.",
         "Take the result with the Copy button in the Output header.",
         "Hover any indentation control for an explanation of what it does."
@@ -341,17 +341,6 @@ private struct WindowSketch: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      HStack(spacing: 6) {
-        Image(systemName: "wand.and.sparkles")
-          .foregroundStyle(.tint)
-        Text("Paste ⌘V → Clean ⌥O → Copy from the right")
-          .fontWeight(.medium)
-        Spacer(minLength: 0)
-      }
-      .font(.caption)
-      .padding(.horizontal, 10)
-      .padding(.vertical, 7)
-      Divider()
       HStack(spacing: 0) {
         pane(title: "Input", code: before)
         Divider()
@@ -359,17 +348,23 @@ private struct WindowSketch: View {
       }
       Divider()
       HStack(spacing: 6) {
+        button("Paste", "doc.on.clipboard", prominent: false)
+        button("Clean", "wand.and.sparkles", prominent: true)
+        Spacer(minLength: 0)
+        Text(verbatim: "Indent Using")
+          .foregroundStyle(.secondary)
+        Text(verbatim: "Spaces")
+          .padding(.horizontal, 6)
+          .padding(.vertical, 3)
+          .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 4))
         Text(verbatim: "Widths")
           .foregroundStyle(.secondary)
         ForEach(["Tab", "Indent"], id: \.self) { caption in
-          Text(verbatim: "4  \(caption)")
+          Text(verbatim: "\(caption)  4")
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 4))
         }
-        Spacer(minLength: 0)
-        button("Paste", "doc.on.clipboard", prominent: false)
-        button("Clean", "wand.and.sparkles", prominent: true)
       }
       .font(.caption)
       .padding(.horizontal, 10)
