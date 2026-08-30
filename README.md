@@ -21,14 +21,15 @@ paste behavior in other apps or uses the Accessibility API.
 ## Install
 
 1. Put `PasteClean.app` in `/Applications` and open it once.
-2. Turn PasteClean on in System Settings ▸ General ▸ Login Items & Extensions ▸ Xcode Source Editor.
+2. In System Settings, search for Extensions if needed, choose Xcode Source
+   Editor, and turn PasteClean on.
 3. Restart Xcode.
 
 ## Use
 
 Select the code and run **Editor ▸ PasteClean ▸ Clean Pasted Code**. No keyboard
 shortcut is required for the menu to appear or work. Optionally assign one in
-Xcode ▸ Settings ▸ Shortcuts — `⌥O` is recommended.
+Xcode ▸ Settings ▸ Key Bindings — `⌥O` is recommended.
 
 With nothing selected it cleans the whole file, and `⌘Z` undoes it. Multiple
 selections are cleaned independently and remain selected.
@@ -42,9 +43,9 @@ spaces or tabs and set the tab and indentation widths; choose **Clean** to apply
 changed settings. Output remains editable and is not overwritten just by
 changing a setting. Toggle line numbers with `⇧⌘L`.
 
-For a walkthrough, open **Help ▸ PasteClean Help**. Its three-step guide
-shows what gets fixed, how to use the app, and then hands off directly to the
-Xcode extension setup guide.
+For a walkthrough, open **Help ▸ PasteClean Help**. The two-step app guide
+shows what gets fixed and how to use the editor. Open **Help ▸ Set up and use
+the Xcode extension** for its separate two-step setup and usage guide.
 
 ## Build
 
@@ -73,6 +74,19 @@ and verify the Editor menu command with a source file open and no shortcut set.
 
 Localized in English and Korean.
 
+## Support
+
+For app questions, bug reports, and feature suggestions, see
+[PasteClean Support](SUPPORT.md). The support page provides the public contact
+address and the information to include with a report.
+
+## Privacy
+
+PasteClean processes editor, clipboard, and Xcode content on your Mac. It has
+no account, analytics, advertising, telemetry, or cloud sync, and it does not
+collect or transmit that content. See the bilingual [Privacy Policy](PRIVACY.md)
+for details.
+
 ## License
 
 PasteClean, including the standalone macOS editor and Xcode Source Editor
@@ -88,3 +102,7 @@ A PARTICULAR PURPOSE. See [LICENSE](LICENSE) for the LGPL v3 terms and
 
 Third-party components, including Apple's `XcodeKit.framework`, remain subject
 to their respective licenses; this license does not replace those terms.
+
+Before submitting a release, use the [App Store release checklist](APP_STORE_RELEASE_CHECKLIST.md)
+to verify the public policy and support URLs, App Privacy answers, bundled
+license notices, metadata, and extension review steps.

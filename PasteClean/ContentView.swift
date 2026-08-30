@@ -23,7 +23,7 @@ struct ContentView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      aboutBar
+      xcodeExtensionBar
       Divider()
       HSplitView {
         pane(title: String(localized: "Input"), text: $input, placeholder: Self.inputPlaceholder)
@@ -42,32 +42,23 @@ struct ContentView: View {
     }
   }
 
-  /// Project context and the public support path, kept at the very top of the
-  /// main window so users can find it without opening another screen.
-  private var aboutBar: some View {
-    HStack(alignment: .top, spacing: 10) {
-      Image(systemName: "info.circle.fill")
+  /// Keep the optional Xcode entry discoverable without placing project and
+  /// support information ahead of the editor itself.
+  private var xcodeExtensionBar: some View {
+    HStack(spacing: 10) {
+      Label("Xcode Extension", systemImage: "puzzlepiece.extension")
+        .font(.subheadline.weight(.semibold))
         .foregroundStyle(.secondary)
-        .padding(.top, 1)
-      VStack(alignment: .leading, spacing: 4) {
-        Text("About PasteClean")
-          .font(.subheadline.weight(.semibold))
-        Text("The PasteClean editor and its Xcode extension are open source.")
-          .font(.callout)
-          .foregroundStyle(.secondary)
-        Text("[github.com/swift-man/PasteClean](https://github.com/swift-man/PasteClean) · [For questions or bug reports, please open an issue.](https://github.com/swift-man/PasteClean/issues/new)")
-          .font(.callout)
-          .foregroundStyle(.secondary)
-      }
       Spacer(minLength: 12)
-      Button("Xcode Extension", systemImage: "puzzlepiece.extension") {
+      Button("Set Up", systemImage: "gearshape") {
         guide.topic = .xcodeExtension
       }
       .buttonStyle(.bordered)
-      .help("Install the extension to use this inside Xcode.")
+      .accessibilityLabel("Set Up Xcode Extension")
+      .help("Enable PasteClean in System Settings for use in Xcode.")
     }
     .padding(.horizontal, 12)
-    .padding(.vertical, 8)
+    .padding(.vertical, 6)
   }
 
   /// One titled editor with a copy button in its header and a placeholder.
@@ -205,19 +196,19 @@ struct ContentView: View {
       .contentShape(.rect)
       .accessibilityLabel(Text(verbatim: "Indent Using"))
       .accessibilityValue(Text(verbatim: usesTabs ? "Tabs" : "Spaces"))
-      .help("Whether the cleaned code is indented with spaces or with tab characters. Match whatever the file you are pasting into already uses — mixing the two is what makes indentation look ragged.")
+      .help("Choose spaces or tabs for Output indentation.")
 
       settingLabel("Widths")
         .padding(.leading, 4)
       widthField(
         "Tab",
         value: $tabWidth,
-        help: String(localized: "How many columns one tab counts as. Match the editor the code came from. This value measures tabs in the pasted code and, when Tabs is selected above, determines how many tabs and spaces are used to write the result.")
+        help: String(localized: "Number of columns represented by one tab.")
       )
       widthField(
         "Indent",
         value: $indentationWidth,
-        help: String(localized: "How many columns one indentation level uses. Code pasted at 4 becomes 2 when this is 2.")
+        help: String(localized: "Number of columns in one indentation level.")
       )
     }
     .controlSize(.small)
@@ -309,7 +300,9 @@ struct ContentView: View {
     )
     """
 
-  private static var outputPlaceholder: String { String(localized: "The cleaned code appears here.") }
+  private static var outputPlaceholder: String {
+    String(localized: "The cleaned code appears here.")
+  }
 
   /// Matches `LineNumberRulerView.ruleThickness`.
   private static let gutterWidth: CGFloat = 38

@@ -10,12 +10,165 @@ import Testing
 @MainActor
 struct GuideAndHelpMenuTests {
 
-  @Test("The extension guide marks shortcut assignment as optional")
-  func extensionGuideMarksShortcutAsOptional() {
-    #expect(GuideTopic.xcodeExtension.stepTitles.count == 3)
+  @Test("About metadata reads version, build, and copyright from the bundle dictionary")
+  func readsAboutMetadata() {
+    let metadata = AppMetadata(infoDictionary: [
+      "CFBundleDisplayName": "PasteClean Test",
+      "CFBundleShortVersionString": "1.2",
+      "CFBundleVersion": "34",
+      "NSHumanReadableCopyright": "Copyright © 2026 PasteClean",
+    ])
+
+    #expect(metadata.appName == "PasteClean Test")
+    #expect(metadata.shortVersion == "1.2")
+    #expect(metadata.buildVersion == "34")
+    #expect(metadata.copyright == "Copyright © 2026 PasteClean")
+  }
+
+  @Test("About metadata ignores blank optional values")
+  func ignoresBlankAboutMetadata() {
+    let metadata = AppMetadata(infoDictionary: [
+      "CFBundleName": "PasteClean",
+      "NSHumanReadableCopyright": "   ",
+    ])
+
+    #expect(metadata.appName == "PasteClean")
+    #expect(metadata.shortVersion == "—")
+    #expect(metadata.buildVersion == "—")
+    #expect(metadata.copyright == nil)
+  }
+
+  @Test("Bundled Markdown keeps headings, paragraphs, and wrapped list items")
+  func parsesBundledMarkdownStructure() {
+    let blocks = MarkdownDocument.blocks(
+      from: """
+        ## Heading
+
+        A paragraph that is
+        wrapped across lines.
+
+        - **Item:** A list item that is
+          wrapped across lines.
+        """)
+
+    #expect(
+      blocks == [
+        .heading(level: 2, text: "Heading"),
+        .paragraph("A paragraph that is wrapped across lines."),
+        .bullet("**Item:** A list item that is wrapped across lines."),
+      ])
+  }
+
+  @Test("The in-app privacy policy shows only the current language")
+  func localizesBundledPrivacyPolicy() {
+    let policy = """
+      # Privacy
+
+      Effective date / 시행일: August 31, 2026 / 2026년 8월 31일
+
+      ## English
+
+      English policy.
+
+      ## 한국어
+
+      한국어 정책입니다.
+      """
+
+    let korean = MarkdownDocument.localizedPrivacyContents(
+      policy,
+      languageCode: "ko"
+    )
+    let english = MarkdownDocument.localizedPrivacyContents(
+      policy,
+      languageCode: "en"
+    )
+
+    #expect(korean.contains("한국어 정책입니다."))
+    #expect(!korean.contains("English policy."))
+    #expect(korean.contains("시행일: 2026년 8월 31일"))
+    #expect(!korean.contains("Effective date"))
+    #expect(english.contains("English policy."))
+    #expect(!english.contains("한국어 정책입니다."))
+    #expect(english.contains("Effective date: August 31, 2026"))
+    #expect(!english.contains("시행일"))
+  }
+
+  @Test("The standard About item opens the custom reusable window")
+  func redirectsStandardAboutItem() {
+    let menu = NSMenu()
+    let nativeAbout = NSMenuItem(
+      title: "About PasteClean",
+      action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
+      keyEquivalent: ""
+    )
+    menu.addItem(nativeAbout)
+
+    AboutMenu.attach(to: menu)
+    AboutMenu.attach(to: menu)
+
+    #expect(nativeAbout.identifier == AboutMenu.itemIdentifier)
+    #expect(nativeAbout.target === AboutWindowController.shared)
+    #expect(nativeAbout.action == #selector(AboutWindowController.showAbout(_:)))
+    #expect(menu.items.filter { $0.identifier == AboutMenu.itemIdentifier }.count == 1)
+    #expect(
+      !menu.items.contains {
+        $0.action == #selector(NSApplication.orderFrontStandardAboutPanel(_:))
+      }
+    )
+  }
+
+  @Test("The application menu is resolved independently of its position")
+  func resolvesApplicationMenu() {
+    let mainMenu = NSMenu()
+    let fileMenu = NSMenu(title: "File")
+    let appMenu = NSMenu(title: "PasteClean")
+    mainMenu.addItem(NSMenuItem(title: "File", action: nil, keyEquivalent: ""))
+    mainMenu.setSubmenu(fileMenu, for: mainMenu.items[0])
+    mainMenu.addItem(NSMenuItem(title: "PasteClean", action: nil, keyEquivalent: ""))
+    mainMenu.setSubmenu(appMenu, for: mainMenu.items[1])
+    appMenu.addItem(
+      NSMenuItem(
+        title: "About PasteClean",
+        action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
+        keyEquivalent: ""
+      ))
+
+    #expect(AboutMenu.resolveApplicationMenu(in: mainMenu) === appMenu)
+  }
+
+  @Test("A late standard About item does not duplicate the custom item")
+  func removesLateStandardAboutItem() throws {
+    let menu = NSMenu()
+    AboutMenu.attach(to: menu)
+    let customAbout = try #require(
+      menu.items.first { $0.identifier == AboutMenu.itemIdentifier }
+    )
+    let lateStandardAbout = NSMenuItem(
+      title: "About PasteClean",
+      action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
+      keyEquivalent: ""
+    )
+    menu.insertItem(lateStandardAbout, at: 0)
+
+    AboutMenu.attach(to: menu)
+
+    #expect(menu.items.filter { $0.identifier == AboutMenu.itemIdentifier }.count == 1)
+    #expect(menu.items.contains { $0 === customAbout })
+    #expect(!menu.items.contains { $0 === lateStandardAbout })
+  }
+
+  @Test("Each guide stays focused on its own workflow")
+  func guidesStayFocused() {
+    #expect(GuideTopic.app.stepTitles.count == 2)
+    #expect(GuideTopic.xcodeExtension.stepTitles.count == 2)
+    #expect(
+      GuideTopic.xcodeExtension.stepTitles[0]
+        == String(localized: "Enable the Xcode extension")
+    )
     #expect(
       GuideTopic.xcodeExtension.stepTitles[1]
-        == String(localized: "Assign a shortcut (optional)")
+        == String(localized: "Use it in Xcode")
     )
   }
 
@@ -90,11 +243,12 @@ struct GuideAndHelpMenuTests {
     let delegate = HelpMenu.Delegate()
     delegate.fill(menu)
 
-    menu.addItem(NSMenuItem(
-      title: "Late native Help",
-      action: #selector(NSApplication.showHelp(_:)),
-      keyEquivalent: ""
-    ))
+    menu.addItem(
+      NSMenuItem(
+        title: "Late native Help",
+        action: #selector(NSApplication.showHelp(_:)),
+        keyEquivalent: ""
+      ))
     menu.insertItem(.separator(), at: 0)
     menu.insertItem(.separator(), at: 0)
 
@@ -105,9 +259,10 @@ struct GuideAndHelpMenuTests {
     #expect(menu.items.filter { $0.identifier == HelpMenu.appHelpIdentifier }.count == 1)
     #expect(!menu.items.contains { $0.action == #selector(NSApplication.showHelp(_:)) })
     #expect(menu.items.first?.isSeparatorItem == false)
-    #expect(!zip(menu.items, menu.items.dropFirst()).contains {
-      $0.isSeparatorItem && $1.isSeparatorItem
-    })
+    #expect(
+      !zip(menu.items, menu.items.dropFirst()).contains {
+        $0.isSeparatorItem && $1.isSeparatorItem
+      })
   }
 
   @Test("A valid guide menu action opens the requested guide")
@@ -160,9 +315,10 @@ struct GuideAndHelpMenuTests {
 
     HelpMenu.Delegate().fill(menu)
 
-    #expect(!zip(menu.items, menu.items.dropFirst()).contains {
-      $0.isSeparatorItem && $1.isSeparatorItem
-    })
+    #expect(
+      !zip(menu.items, menu.items.dropFirst()).contains {
+        $0.isSeparatorItem && $1.isSeparatorItem
+      })
   }
 
   @Test("The last submenu is used while AppKit is still building Help")

@@ -45,16 +45,18 @@ struct ProjectConfigurationTests {
       ) as? [String: Any]
     )
     let objects = try #require(project["objects"] as? [String: [String: Any]])
-    let target = try #require(objects.values.first {
-      $0["isa"] as? String == "PBXNativeTarget"
-        && $0["name"] as? String == "PasteCleanExtension"
-    })
+    let target = try #require(
+      objects.values.first {
+        $0["isa"] as? String == "PBXNativeTarget"
+          && $0["name"] as? String == "PasteCleanExtension"
+      })
     let phaseIDs = try #require(target["buildPhases"] as? [String])
     let phases = try phaseIDs.map { try #require(objects[$0]) }
-    let embedPhase = try #require(phases.first {
-      $0["isa"] as? String == "PBXCopyFilesBuildPhase"
-        && $0["dstSubfolderSpec"] as? String == "10"
-    })
+    let embedPhase = try #require(
+      phases.first {
+        $0["isa"] as? String == "PBXCopyFilesBuildPhase"
+          && $0["dstSubfolderSpec"] as? String == "10"
+      })
 
     // XcodeKit is not a system framework: linking alone builds successfully
     // but leaves Xcode unable to load the installed extension.
@@ -64,11 +66,12 @@ struct ProjectConfigurationTests {
 
     let embeddedFileIDs = try #require(embedPhase["files"] as? [String])
     let embeddedFiles = try embeddedFileIDs.map { try #require(objects[$0]) }
-    let embeddedFramework = try #require(embeddedFiles.first { file in
-      guard let referenceID = file["fileRef"] as? String else { return false }
-      return objects[referenceID]?["path"] as? String
-        == "Library/Frameworks/XcodeKit.framework"
-    })
+    let embeddedFramework = try #require(
+      embeddedFiles.first { file in
+        guard let referenceID = file["fileRef"] as? String else { return false }
+        return objects[referenceID]?["path"] as? String
+          == "Library/Frameworks/XcodeKit.framework"
+      })
     let frameworkID = try #require(embeddedFramework["fileRef"] as? String)
     #expect(objects[frameworkID]?["sourceTree"] as? String == "DEVELOPER_DIR")
 
@@ -77,11 +80,86 @@ struct ProjectConfigurationTests {
     #expect(attributes.contains("CodeSignOnCopy"))
     #expect(attributes.contains("RemoveHeadersOnCopy"))
 
-    let linkPhase = try #require(phases.first {
-      $0["isa"] as? String == "PBXFrameworksBuildPhase"
-    })
+    let linkPhase = try #require(
+      phases.first {
+        $0["isa"] as? String == "PBXFrameworksBuildPhase"
+      })
     let linkedFileIDs = try #require(linkPhase["files"] as? [String])
     #expect(linkedFileIDs.contains { objects[$0]?["fileRef"] as? String == frameworkID })
+  }
+
+  @Test("The app bundles its license and privacy notices")
+  func appBundlesLegalNotices() throws {
+    let objects = try projectObjects()
+    let resourcePaths = try appResourcePaths(in: objects)
+
+    let requiredNotices = ["LICENSE", "COPYING", "PRIVACY.md"]
+    for notice in requiredNotices {
+      #expect(resourcePaths.contains(notice))
+
+      let noticeURL = repositoryRootURL.appendingPathComponent(notice)
+      let contents = try String(contentsOf: noticeURL, encoding: .utf8)
+      #expect(!contents.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
+  }
+
+  @Test("The app bundles an accurate privacy manifest")
+  func appBundlesPrivacyManifest() throws {
+    let objects = try projectObjects()
+    #expect(try appResourcePaths(in: objects).contains("PrivacyInfo.xcprivacy"))
+
+    let manifestURL =
+      repositoryRootURL
+      .appendingPathComponent("PasteClean/PrivacyInfo.xcprivacy")
+    let manifest = try #require(
+      PropertyListSerialization.propertyList(
+        from: Data(contentsOf: manifestURL),
+        format: nil
+      ) as? [String: Any]
+    )
+
+    #expect(manifest["NSPrivacyTracking"] as? Bool == false)
+    #expect((manifest["NSPrivacyCollectedDataTypes"] as? [Any])?.isEmpty == true)
+
+    let accessedAPIs = try #require(
+      manifest["NSPrivacyAccessedAPITypes"] as? [[String: Any]]
+    )
+    let userDefaults = try #require(
+      accessedAPIs.first {
+        $0["NSPrivacyAccessedAPIType"] as? String
+          == "NSPrivacyAccessedAPICategoryUserDefaults"
+      })
+    #expect(
+      userDefaults["NSPrivacyAccessedAPITypeReasons"] as? [String]
+        == ["CA92.1"]
+    )
+  }
+
+  @Test("Every app build configuration has a copyright notice")
+  func appBuildConfigurationsHaveCopyrightNotice() throws {
+    let objects = try projectObjects()
+    let appTarget = try #require(
+      objects.values.first {
+        $0["isa"] as? String == "PBXNativeTarget"
+          && $0["name"] as? String == "PasteClean"
+      })
+    let configurationListID = try #require(
+      appTarget["buildConfigurationList"] as? String
+    )
+    let configurationList = try #require(objects[configurationListID])
+    let configurationIDs = try #require(
+      configurationList["buildConfigurations"] as? [String]
+    )
+    #expect(!configurationIDs.isEmpty)
+
+    for configurationID in configurationIDs {
+      let configuration = try #require(objects[configurationID])
+      let settings = try #require(configuration["buildSettings"] as? [String: Any])
+      let copyright = try #require(
+        settings["INFOPLIST_KEY_NSHumanReadableCopyright"] as? String
+      )
+      #expect(!copyright.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
   }
 
   @Test("App, extension, and tests use one advanced TestFlight build number")
@@ -91,9 +169,10 @@ struct ProjectConfigurationTests {
       encoding: .utf8
     )
     let marker = "CURRENT_PROJECT_VERSION = "
-    let buildNumbers = projectContents.split(whereSeparator: \.isNewline).compactMap { line -> Int? in
+    let buildNumbers = projectContents.split(whereSeparator: \.isNewline).compactMap {
+      line -> Int? in
       guard let markerRange = line.range(of: marker),
-            let value = line[markerRange.upperBound...].split(separator: ";").first
+        let value = line[markerRange.upperBound...].split(separator: ";").first
       else { return nil }
       return Int(value.trimmingCharacters(in: .whitespaces))
     }
@@ -103,7 +182,32 @@ struct ProjectConfigurationTests {
     #expect(buildNumbers.count == 6)
     #expect(Set(buildNumbers).count == 1)
     let buildNumber = try #require(buildNumbers.first)
-    #expect(buildNumber >= 4)
+    #expect(buildNumber >= 8)
+  }
+
+  @Test("App, extension, and tests match VERSION.txt")
+  func marketingVersionsStaySynchronized() throws {
+    let expectedVersion = try String(
+      contentsOf: repositoryRootURL.appendingPathComponent("VERSION.txt"),
+      encoding: .utf8
+    ).trimmingCharacters(in: .whitespacesAndNewlines)
+    let projectContents = try String(
+      contentsOf: projectFileURL,
+      encoding: .utf8
+    )
+    let marker = "MARKETING_VERSION = "
+    let marketingVersions =
+      projectContents
+      .split(whereSeparator: \.isNewline)
+      .compactMap { line -> String? in
+        guard let markerRange = line.range(of: marker),
+          let value = line[markerRange.upperBound...].split(separator: ";").first
+        else { return nil }
+        return value.trimmingCharacters(in: .whitespaces)
+      }
+
+    #expect(marketingVersions.count == 6)
+    #expect(Set(marketingVersions) == [expectedVersion])
   }
 
   @Test("The shared app scheme archives the host app")
@@ -158,6 +262,39 @@ struct ProjectConfigurationTests {
   private var projectFileURL: URL {
     repositoryRootURL
       .appendingPathComponent("PasteClean.xcodeproj/project.pbxproj")
+  }
+
+  private func projectObjects() throws -> [String: [String: Any]] {
+    let project = try #require(
+      PropertyListSerialization.propertyList(
+        from: Data(contentsOf: projectFileURL),
+        format: nil
+      ) as? [String: Any]
+    )
+    return try #require(project["objects"] as? [String: [String: Any]])
+  }
+
+  private func appResourcePaths(
+    in objects: [String: [String: Any]]
+  ) throws -> Set<String> {
+    let appTarget = try #require(
+      objects.values.first {
+        $0["isa"] as? String == "PBXNativeTarget"
+          && $0["name"] as? String == "PasteClean"
+      })
+    let phaseIDs = try #require(appTarget["buildPhases"] as? [String])
+    let resourcePhase = try #require(
+      phaseIDs.compactMap { objects[$0] }.first {
+        $0["isa"] as? String == "PBXResourcesBuildPhase"
+      })
+    let resourceBuildFileIDs = try #require(resourcePhase["files"] as? [String])
+    return Set(
+      resourceBuildFileIDs.compactMap { buildFileID -> String? in
+        guard let fileReferenceID = objects[buildFileID]?["fileRef"] as? String else {
+          return nil
+        }
+        return objects[fileReferenceID]?["path"] as? String
+      })
   }
 
   private var extensionEntitlementsFileURL: URL {

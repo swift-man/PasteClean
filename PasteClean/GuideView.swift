@@ -19,22 +19,22 @@ enum GuideTopic: String, Identifiable {
   var title: String {
     switch self {
     case .app: String(localized: "How to use PasteClean")
-    case .xcodeExtension: String(localized: "Install and use the Xcode extension")
+    case .xcodeExtension: String(localized: "Set up and use the Xcode extension")
     }
   }
 
   var stepTitles: [String] {
     switch self {
-    case .app: [
-      String(localized: "What it fixes"),
-      String(localized: "Using the app"),
-      String(localized: "Use it inside Xcode")
-    ]
-    case .xcodeExtension: [
-      String(localized: "Enable the extension"),
-      String(localized: "Assign a shortcut (optional)"),
-      String(localized: "Use it in Xcode")
-    ]
+    case .app:
+      [
+        String(localized: "What it fixes"),
+        String(localized: "Using the app"),
+      ]
+    case .xcodeExtension:
+      [
+        String(localized: "Enable the Xcode extension"),
+        String(localized: "Use it in Xcode"),
+      ]
     }
   }
 }
@@ -65,13 +65,11 @@ enum GuideTopic: String, Identifiable {
 
 /// Shown as a sheet, one step at a time.
 ///
-/// Step 1 shows what the cleaner does; the rest are the one-off setup for the
-/// Xcode extension. Anything needed while actually working lives in the main
-/// window instead, so it is visible without opening this.
+/// Each topic stays focused on its own workflow: app onboarding explains the
+/// editor, while the Xcode guide covers extension setup and use.
 struct GuideView: View {
   let topic: GuideTopic
-  /// Opens another guide, or closes the sheet when passed `nil`. The last app
-  /// step hands off to the extension guide, so closing is not enough.
+  /// Opens another guide, or closes the sheet when passed `nil`.
   let open: (GuideTopic?) -> Void
 
   @State private var step = 0
@@ -144,10 +142,8 @@ struct GuideView: View {
   @ViewBuilder private func content(_ step: Int) -> some View {
     switch (topic, step) {
     case (.app, 0): preview
-    case (.app, 1): appUseStep
-    case (.app, _): appExtensionStep
+    case (.app, _): appUseStep
     case (.xcodeExtension, 0): enableStep
-    case (.xcodeExtension, 1): shortcutStep
     default: extensionUseStep
     }
   }
@@ -160,8 +156,10 @@ struct GuideView: View {
         CodeBlock(title: "Before", code: Self.before)
         CodeBlock(title: "After", code: Self.after)
       }
-      Text("Copying from a rendered Markdown code block leaves a blank line between every line, trailing whitespace at the ends, and indentation that does not match your project. This fixes all of it at once.")
-        .fixedSize(horizontal: false, vertical: true)
+      Text(
+        "PasteClean removes extra blank lines and trailing whitespace, then matches your indentation."
+      )
+      .fixedSize(horizontal: false, vertical: true)
     }
   }
 
@@ -169,59 +167,25 @@ struct GuideView: View {
     VStack(alignment: .leading, spacing: 16) {
       WindowSketch(before: Self.before, after: Self.after)
       Steps(items: [
-        "Paste or edit code in Input. ⌘V pastes at the cursor. ⇧⌘V replaces Input and cleans it.",
-        "Press ⌥O, or the Clean button, and the result appears in Output on the right.",
-        "Take the result with the Copy button in the Output header.",
-        "Hover any indentation control for an explanation of what it does."
+        "Paste or edit code in Input. ⌘V pastes at the cursor; ⇧⌘V replaces all input and cleans it.",
+        "Choose Clean or press ⌥O.",
+        "Copy the result from Output.",
       ])
     }
   }
 
-  /// The app is the fallback, not the main event: anyone already in Xcode can
-  /// skip the copying entirely, so the last step points them at the extension.
-  private var appExtensionStep: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Writing Swift in Xcode? Then you never have to come here. The same cleaner installs as a source editor extension and runs on the file you already have open.")
-        .fixedSize(horizontal: false, vertical: true)
-      MenuPath(items: ["Editor", "PasteClean", "Clean Pasted Code"])
-      Steps(items: [
-        "Select the code you pasted, or nothing at all to clean the whole file.",
-        "Run that menu item, or the keyboard shortcut you give it.",
-        "Indentation follows Xcode's own settings, so none of the controls here apply."
-      ]) {
-        Button("Set Up the Extension", systemImage: "puzzlepiece.extension") {
-          open(.xcodeExtension)
-        }
-        .controlSize(.large)
-      }
-    }
-  }
-
   private var enableStep: some View {
-    Steps(items: [
-      "Open System Settings ▸ General ▸ Login Items & Extensions.",
-      "Select Xcode Source Editor.",
-      "Turn PasteClean on.",
-      "Restart Xcode if it was already running."
-    ]) {
+    VStack(alignment: .leading, spacing: 16) {
       Button("Open Extension Settings", systemImage: "gearshape") {
         NSWorkspace.shared.open(
           URL(string: "x-apple.systempreferences:com.apple.ExtensionsPreferences")!
         )
       }
       .controlSize(.large)
-    }
-  }
-
-  private var shortcutStep: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("The command appears in the Editor menu without a shortcut.")
-        .fixedSize(horizontal: false, vertical: true)
-      MenuPath(items: ["Xcode", "Settings", "Shortcuts"])
       Steps(items: [
-        "Open that pane.",
-        "Search for Clean Pasted Code.",
-        "Type a shortcut. ⌥O is recommended."
+        "Choose Xcode Source Editor, then turn PasteClean on.",
+        "If the page does not open directly, search System Settings for Extensions.",
+        "Restart Xcode if it was already running.",
       ])
     }
   }
@@ -230,11 +194,16 @@ struct GuideView: View {
     VStack(alignment: .leading, spacing: 16) {
       MenuPath(items: ["Editor", "PasteClean", "Clean Pasted Code"])
       Steps(items: [
-        "Select the code you want to clean.",
-        "Run that menu item, or the keyboard shortcut you give it.",
-        "With nothing selected it cleans the whole file. ⌘Z undoes it.",
-        "Indentation follows Xcode's own settings, so there is nothing to configure."
+        "Select code, or leave the selection empty to clean the whole file.",
+        "Run this menu command. ⌘Z undoes the change.",
+        "Indentation follows Xcode's settings.",
       ])
+      Text(
+        "A shortcut is optional. Search for Clean Pasted Code in Xcode Settings > Key Bindings to assign one."
+      )
+      .font(.callout)
+      .foregroundStyle(.secondary)
+      .fixedSize(horizontal: false, vertical: true)
     }
   }
 
