@@ -176,7 +176,7 @@ struct ContentView: View {
       .menuIndicator(.hidden)
       .buttonStyle(.plain)
       .frame(width: Self.indentationPickerWidth, height: 22)
-      .background(Color.white.opacity(0.10), in: .rect(cornerRadius: 6))
+      .background(Color.secondary.opacity(0.12), in: .rect(cornerRadius: 6))
       .overlay {
         HStack(spacing: 6) {
           Text(verbatim: usesTabs ? "Tabs" : "Spaces")
@@ -191,7 +191,7 @@ struct ContentView: View {
       }
       .overlay {
         RoundedRectangle(cornerRadius: 6)
-          .strokeBorder(Color.white.opacity(0.04))
+          .strokeBorder(Color.secondary.opacity(0.10))
       }
       .contentShape(.rect)
       .accessibilityLabel(Text(verbatim: "Indent Using"))
