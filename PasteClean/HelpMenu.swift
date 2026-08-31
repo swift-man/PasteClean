@@ -26,7 +26,7 @@ enum HelpMenu {
       for _ in 0..<20 {
         guard !Task.isCancelled else { return }
         attach()
-        try? await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(for: .milliseconds(500))
       }
     }
   }

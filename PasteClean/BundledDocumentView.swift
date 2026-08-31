@@ -101,9 +101,7 @@ struct MarkdownDocument {
   static func blocks(from markdown: String) -> [Block] {
     let lines =
       markdown
-      .replacingOccurrences(of: "\r\n", with: "\n")
-      .replacingOccurrences(of: "\r", with: "\n")
-      .split(separator: "\n", omittingEmptySubsequences: false)
+      .split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
       .map(String.init)
     var blocks: [Block] = []
     var index = 0

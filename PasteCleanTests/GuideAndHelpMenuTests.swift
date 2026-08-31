@@ -59,6 +59,20 @@ struct GuideAndHelpMenuTests {
       ])
   }
 
+  @Test("Bundled Markdown accepts mixed and Unicode line endings")
+  func parsesBundledMarkdownLineEndings() {
+    let blocks = MarkdownDocument.blocks(
+      from: "## Heading\r\n\r\nA paragraph.\r\r- Item\u{2028}continued"
+    )
+
+    #expect(
+      blocks == [
+        .heading(level: 2, text: "Heading"),
+        .paragraph("A paragraph."),
+        .bullet("Item continued"),
+      ])
+  }
+
   @Test("The in-app privacy policy shows only the current language")
   func localizesBundledPrivacyPolicy() {
     let policy = """

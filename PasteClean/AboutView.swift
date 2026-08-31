@@ -210,7 +210,7 @@ final class AboutWindowController: NSWindowController {
 
   @objc func showAbout(_ sender: Any?) {
     guard let window else { return }
-    NSApplication.shared.activate(ignoringOtherApps: true)
+    NSApplication.shared.activate()
     window.makeKeyAndOrderFront(sender)
   }
 }
