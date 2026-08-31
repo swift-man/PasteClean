@@ -12,6 +12,12 @@ enum BundledDocument: String, CaseIterable, Identifiable {
 
   var id: String { rawValue }
 
+  var resourceFilename: String {
+    let resource = resource
+    guard let fileExtension = resource.extension else { return resource.name }
+    return "\(resource.name).\(fileExtension)"
+  }
+
   var title: LocalizedStringKey {
     switch self {
     case .privacyPolicy:
@@ -41,8 +47,7 @@ struct BundledDocumentView: View {
 
   init(
     document: BundledDocument,
-    bundle: Bundle = .main,
-    locale: Locale = .current
+    bundle: Bundle = .main
   ) {
     self.document = document
     let resource = document.resource
@@ -53,7 +58,7 @@ struct BundledDocumentView: View {
     if document == .privacyPolicy, let loadedContents {
       contents = MarkdownDocument.localizedPrivacyContents(
         loadedContents,
-        languageCode: locale.language.languageCode?.identifier
+        languageCode: bundle.preferredLocalizations.first
       )
     } else {
       contents = loadedContents
@@ -146,14 +151,15 @@ struct MarkdownDocument {
     let englishMarker = "## English"
     let koreanMarker = "## 한국어"
     guard let englishRange = contents.range(of: englishMarker),
-      let koreanRange = contents.range(of: koreanMarker)
+      let koreanRange = contents.range(of: koreanMarker),
+      englishRange.upperBound <= koreanRange.lowerBound
     else { return contents }
 
     let sourceDateLine =
       contents
       .split(whereSeparator: \.isNewline)
-      .map(String.init)
       .first { $0.hasPrefix("Effective date / 시행일:") }
+      .map(String.init)
     let usesKorean = languageCode?.lowercased().hasPrefix("ko") == true
     let dateLine = sourceDateLine.map {
       localizedDateLine(from: $0, usesKorean: usesKorean)
@@ -218,7 +224,7 @@ private struct MarkdownDocumentView: View {
           inlineText(text)
         case .bullet(let text):
           HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Text("•")
+            Text(verbatim: "•")
             inlineText(text)
           }
           .padding(.leading, 4)

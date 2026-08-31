@@ -182,9 +182,12 @@ struct GuideView: View {
         )
       }
       .controlSize(.large)
+      Text("If the page does not open directly, search System Settings for Extensions.")
+        .font(.callout)
+        .foregroundStyle(.secondary)
+        .fixedSize(horizontal: false, vertical: true)
       Steps(items: [
         "Choose Xcode Source Editor, then turn PasteClean on.",
-        "If the page does not open directly, search System Settings for Extensions.",
         "Restart Xcode if it was already running.",
       ])
     }

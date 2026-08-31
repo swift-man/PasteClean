@@ -260,12 +260,11 @@ enum AboutMenu {
   }
 
   static func resolveApplicationMenu(in mainMenu: NSMenu?) -> NSMenu? {
-    let submenus = mainMenu?.items.compactMap(\.submenu) ?? []
-    return submenus.first { submenu in
+    mainMenu?.items.compactMap(\.submenu).first { submenu in
       submenu.items.contains {
         $0.identifier == itemIdentifier
           || $0.action == #selector(NSApplication.orderFrontStandardAboutPanel(_:))
       }
-    } ?? submenus.first
+    }
   }
 }

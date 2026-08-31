@@ -93,7 +93,10 @@ struct ProjectConfigurationTests {
     let objects = try projectObjects()
     let resourcePaths = try appResourcePaths(in: objects)
 
-    let requiredNotices = ["LICENSE", "COPYING", "PRIVACY.md"]
+    let requiredNotices: Set = ["LICENSE", "COPYING", "PRIVACY.md"]
+    #expect(
+      Set(BundledDocument.allCases.map(\.resourceFilename)) == requiredNotices
+    )
     for notice in requiredNotices {
       #expect(resourcePaths.contains(notice))
 

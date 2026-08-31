@@ -108,6 +108,46 @@ struct GuideAndHelpMenuTests {
     #expect(!english.contains("시행일"))
   }
 
+  @Test("Privacy localization falls back when section markers are reversed")
+  func rejectsReversedPrivacySectionMarkers() {
+    let malformedPolicy = """
+      # Privacy
+
+      ## 한국어
+
+      한국어 정책입니다.
+
+      ## English
+
+      English policy.
+      """
+
+    #expect(
+      MarkdownDocument.localizedPrivacyContents(
+        malformedPolicy,
+        languageCode: "en"
+      ) == malformedPolicy
+    )
+  }
+
+  @Test("Privacy localization falls back when a section marker is missing")
+  func rejectsMissingPrivacySectionMarker() {
+    let incompletePolicy = """
+      # Privacy
+
+      ## English
+
+      English policy.
+      """
+
+    #expect(
+      MarkdownDocument.localizedPrivacyContents(
+        incompletePolicy,
+        languageCode: "en"
+      ) == incompletePolicy
+    )
+  }
+
   @Test("The standard About item opens the custom reusable window")
   func redirectsStandardAboutItem() {
     let menu = NSMenu()
@@ -149,6 +189,16 @@ struct GuideAndHelpMenuTests {
       ))
 
     #expect(AboutMenu.resolveApplicationMenu(in: mainMenu) === appMenu)
+  }
+
+  @Test("The application menu resolver does not guess without an About item")
+  func doesNotGuessApplicationMenu() {
+    let mainMenu = NSMenu()
+    let fileMenu = NSMenu(title: "File")
+    mainMenu.addItem(NSMenuItem(title: "File", action: nil, keyEquivalent: ""))
+    mainMenu.setSubmenu(fileMenu, for: mainMenu.items[0])
+
+    #expect(AboutMenu.resolveApplicationMenu(in: mainMenu) == nil)
   }
 
   @Test("A late standard About item does not duplicate the custom item")

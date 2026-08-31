@@ -297,23 +297,6 @@
         }
       }
     },
-    "Enable the extension" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable the Xcode extension"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Xcode 확장 프로그램 활성화"
-          }
-        }
-      }
-    },
     "Enable PasteClean in System Settings for use in Xcode." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -531,40 +514,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "입력"
-          }
-        }
-      }
-    },
-    "Install and use the Xcode extension" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Set up and use the Xcode extension"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Xcode 확장 프로그램 설정 및 사용"
-          }
-        }
-      }
-    },
-    "Install the extension to use this inside Xcode." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable the extension to use PasteClean in Xcode."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Xcode에서 PasteClean을 사용하려면 확장 프로그램을 활성화하세요."
           }
         }
       }
@@ -1379,7 +1328,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Xcode extension"
+            "value" : "Xcode Extension"
           }
         },
         "ko" : {
