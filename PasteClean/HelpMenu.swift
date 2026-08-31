@@ -26,7 +26,7 @@ enum HelpMenu {
       for _ in 0..<20 {
         guard !Task.isCancelled else { return }
         attach()
-        try? await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(for: .milliseconds(500))
       }
     }
   }
@@ -49,6 +49,7 @@ enum HelpMenu {
 
   private static func attach() {
     attach(to: helpMenu)
+    AboutMenu.attach()
   }
 
   /// Accepts a menu explicitly so the AppKit boundary can be verified without
@@ -86,7 +87,7 @@ enum HelpMenu {
   }
 
   static let extensionEntry = (
-    title: String(localized: "Install and use the Xcode extension"),
+    title: String(localized: "Set up and use the Xcode extension"),
     topic: GuideTopic.xcodeExtension
   )
   static let appHelpTitle = String(localized: "PasteClean Help")
@@ -135,8 +136,10 @@ enum HelpMenu {
 
       // AppKit can append its original help-book item after the delegate has
       // filled the menu. The next attachment pass removes that duplicate.
-      for duplicate in menu.items where duplicate !== item
-        && duplicate.action == #selector(NSApplication.showHelp(_:)) {
+      for duplicate in menu.items
+      where duplicate !== item
+        && duplicate.action == #selector(NSApplication.showHelp(_:))
+      {
         menu.removeItem(duplicate)
       }
     }
@@ -160,7 +163,7 @@ enum HelpMenu {
       }
 
       guard let index = menu.items.firstIndex(of: item), index + 1 < menu.items.count,
-            !menu.items[index + 1].isSeparatorItem
+        !menu.items[index + 1].isSeparatorItem
       else { return }
       menu.insertItem(.separator(), at: index + 1)
     }
@@ -189,7 +192,7 @@ enum HelpMenu {
 
     @objc func open(_ sender: NSMenuItem) {
       guard let raw = sender.representedObject as? String,
-            let topic = GuideTopic(rawValue: raw)
+        let topic = GuideTopic(rawValue: raw)
       else { return }
       GuideState.shared.topic = topic
     }

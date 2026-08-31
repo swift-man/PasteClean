@@ -12,8 +12,16 @@
 		AA0300000000000000000001 /* GuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0300000000000000000002 /* GuideView.swift */; };
 		AA0400000000000000000001 /* CodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0400000000000000000002 /* CodeTextView.swift */; };
 		AA0500000000000000000001 /* HelpMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0500000000000000000002 /* HelpMenu.swift */; };
+		AA1400000000000000000001 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1400000000000000000005 /* AboutView.swift */; };
+		AA1400000000000000000002 /* BundledDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1400000000000000000006 /* BundledDocumentView.swift */; };
+		AA1400000000000000000003 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1400000000000000000005 /* AboutView.swift */; };
+		AA1400000000000000000004 /* BundledDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1400000000000000000006 /* BundledDocumentView.swift */; };
 		05D6C9107CE4A611655D4572 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 06A922D9CB208DABFF6AC0BE /* Assets.xcassets */; };
 		AA0600000000000000000001 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AA0600000000000000000002 /* Localizable.xcstrings */; };
+		AA1300000000000000000001 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = AA1300000000000000000004 /* LICENSE */; };
+		AA1300000000000000000002 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = AA1300000000000000000005 /* COPYING */; };
+		AA1300000000000000000003 /* PRIVACY.md in Resources */ = {isa = PBXBuildFile; fileRef = AA1300000000000000000006 /* PRIVACY.md */; };
+		AA1500000000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA1500000000000000000002 /* PrivacyInfo.xcprivacy */; };
 		07F8369F4D14F5E705953B51 /* PasteCleanExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 08BA7964369EE482271FEAED /* PasteCleanExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0904F570506DE3D6D611EB2E /* SourceEditorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A22BFFCF1D879F19C99F5FA /* SourceEditorExtension.swift */; };
 		0BCCCB4C6376BA04A1412DB5 /* CleanPastedCodeCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7EB8EBE3D4B5F5F2E16A94 /* CleanPastedCodeCommand.swift */; };
@@ -73,6 +81,8 @@
 		AA0300000000000000000002 /* GuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideView.swift; sourceTree = "<group>"; };
 		AA0400000000000000000002 /* CodeTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTextView.swift; sourceTree = "<group>"; };
 		AA0500000000000000000002 /* HelpMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpMenu.swift; sourceTree = "<group>"; };
+		AA1400000000000000000005 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		AA1400000000000000000006 /* BundledDocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledDocumentView.swift; sourceTree = "<group>"; };
 		06A922D9CB208DABFF6AC0BE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA0600000000000000000002 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		08BA7964369EE482271FEAED /* PasteCleanExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PasteCleanExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +99,12 @@
 		174776D1BF305E9154517B06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		18C11409371F2684FC0EAB93 /* PasteCleanExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PasteCleanExtension.entitlements; sourceTree = "<group>"; };
 		19C667AA09E565BED3F4E7EF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		AA1300000000000000000004 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		AA1300000000000000000005 /* COPYING */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
+		AA1300000000000000000006 /* PRIVACY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY.md; sourceTree = "<group>"; };
+		AA1300000000000000000007 /* APP_STORE_RELEASE_CHECKLIST.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = APP_STORE_RELEASE_CHECKLIST.md; sourceTree = "<group>"; };
+		AA1500000000000000000002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AA1500000000000000000003 /* SUPPORT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUPPORT.md; sourceTree = "<group>"; };
 		32E5A97B1C4D60F83A2B7E15 /* CodeCleanerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeCleanerTests.swift; sourceTree = "<group>"; };
 		33B70D2E9F58A14C6E03D7B9 /* PasteCleanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PasteCleanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -123,6 +139,11 @@
 			isa = PBXGroup;
 			children = (
 				19C667AA09E565BED3F4E7EF /* README.md */,
+				AA1300000000000000000006 /* PRIVACY.md */,
+				AA1500000000000000000003 /* SUPPORT.md */,
+				AA1300000000000000000004 /* LICENSE */,
+				AA1300000000000000000005 /* COPYING */,
+				AA1300000000000000000007 /* APP_STORE_RELEASE_CHECKLIST.md */,
 				1D9A77D8E85D38B742B32E19 /* PasteClean */,
 				1EE076BFD3B4F04CB083F039 /* PasteCleanExtension */,
 				34D19E6A0B37C5F2481A9E64 /* PasteCleanTests */,
@@ -139,8 +160,11 @@
 				AA0300000000000000000002 /* GuideView.swift */,
 				AA0400000000000000000002 /* CodeTextView.swift */,
 				AA0500000000000000000002 /* HelpMenu.swift */,
+				AA1400000000000000000005 /* AboutView.swift */,
+				AA1400000000000000000006 /* BundledDocumentView.swift */,
 				06A922D9CB208DABFF6AC0BE /* Assets.xcassets */,
 				AA0600000000000000000002 /* Localizable.xcstrings */,
+				AA1500000000000000000002 /* PrivacyInfo.xcprivacy */,
 				16F98C1F8A090D5206875B73 /* PasteClean.entitlements */,
 			);
 			path = PasteClean;
@@ -294,6 +318,10 @@
 			files = (
 				05D6C9107CE4A611655D4572 /* Assets.xcassets in Resources */,
 				AA0600000000000000000001 /* Localizable.xcstrings in Resources */,
+				AA1300000000000000000001 /* LICENSE in Resources */,
+				AA1300000000000000000002 /* COPYING in Resources */,
+				AA1300000000000000000003 /* PRIVACY.md in Resources */,
+				AA1500000000000000000001 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +350,8 @@
 				AA0300000000000000000001 /* GuideView.swift in Sources */,
 				AA0400000000000000000001 /* CodeTextView.swift in Sources */,
 				AA0500000000000000000001 /* HelpMenu.swift in Sources */,
+				AA1400000000000000000001 /* AboutView.swift in Sources */,
+				AA1400000000000000000002 /* BundledDocumentView.swift in Sources */,
 				013722F812757E07AA5E2606 /* PasteCleanApp.swift in Sources */,
 				AA0200000000000000000001 /* CodeCleaner.swift in Sources */,
 			);
@@ -349,6 +379,8 @@
 				AA0800000000000000000001 /* GuideView.swift in Sources */,
 				AA0800000000000000000002 /* HelpMenu.swift in Sources */,
 				AA0800000000000000000003 /* GuideAndHelpMenuTests.swift in Sources */,
+				AA1400000000000000000003 /* AboutView.swift in Sources */,
+				AA1400000000000000000004 /* BundledDocumentView.swift in Sources */,
 				AA0900000000000000000001 /* ProjectConfigurationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -434,14 +466,14 @@
 				CODE_SIGN_ENTITLEMENTS = PasteClean/PasteClean.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = PasteClean;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Seungjin Kim";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -461,14 +493,14 @@
 				CODE_SIGN_ENTITLEMENTS = PasteClean/PasteClean.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = PasteClean;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Seungjin Kim";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -485,7 +517,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PasteCleanExtension/PasteCleanExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -513,7 +545,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PasteCleanExtension/PasteCleanExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -540,7 +572,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -559,7 +591,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Y7YQUS95SK;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
